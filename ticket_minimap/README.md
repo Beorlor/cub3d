@@ -1,0 +1,1 @@
+La minimap nest pas initialiser

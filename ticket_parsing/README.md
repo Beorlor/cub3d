@@ -110,6 +110,8 @@ typedef struct s_player {
     double y;
     double dir_x;
     double dir_y;
+    double plane_x;
+    double plane_y;
 } t_player;
 
 typedef struct s_game {
@@ -120,3 +122,8 @@ typedef struct s_game {
     t_player player;
 } t_game;
 ```
+
+
+## Ajout depuis premiere redaction du fichier
+
+Check que le player est bien a linterrieur des murs de la map
