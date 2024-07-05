@@ -140,6 +140,10 @@ Il faut init la minilibx, charger les textures.
     }
     ```
 
+### Tips :
+
+Definir une fonction cleanup avec tout les free lors de ce ticket
+
 ### Définition des structures nécessaires :
 
 ```c
