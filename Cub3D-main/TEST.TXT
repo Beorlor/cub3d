@@ -1,0 +1,48 @@
+-------------------------------------------------- FILE ----------------------------------------------
+- Manque un espace entre les textures ou rgb et leur valeur => OK
+- Manque un espace entre le groupe rgb et textures => KO : TO FIX
+- Manque une ligne vide entre les couleurs et la map => KO : TO FIX
+- Quelque chose (autre que vide) apres la map => OK
+- Not .cub file => OK
+- Not an xpm file => TO TEST WITH A VALID IMAGE !
+- Couleurs rgb sol invalides
+- Couleurs rgb plafond invalides
+- Une couleur rgb manque => OK
+    - Invalid plafond color => Double error message > Check what we keep !
+- Valeur RGB invalide (min: 0, max: 255) => OK
+    - Invalid sol color => OK
+- Textures manquantes => OK
+- Textures paths invalides (path + directory)
+      - OK but need to test with a real image !
+- Couleur manquante plafond => OK
+- Couleur manquante sol => OK
+- RGB double => OK
+- Manque virgule RGB colors => OK
+- Manque espace entre ID et path texture => OK
+- Pas de couleurs => OK
+- File vide => OK
+- Map n'est pas le dernier element de la map => OK
+- Pas de type file => OK
+- Textures en double 
+    => OK if same texture ID (NO / SO / etc.)
+    => OK > Map description error
+
+-------------------------------------------------- MAP ----------------------------------------------
+- Map interdite
+    - Player coincé => OSEF
+- Map en premier => OK
+- Map au milieu => OK
+- Pas de map => OK
+- Juste la map => OK
+- Plusieurs maps => OK
+- Map trop petite => OK but position player error
+- Plusieurs players => OK
+- Pas de player => OK
+- Player dans le mur (invalid position) => OK but floodfill error (walls)
+- Trou dans le mur est => OK
+- Trou dans le mur nord => OK
+- Trou dans le mur sud => OK
+- Trou dans le mur ouest => OK
+- Trou dans le mur diagonale => OK
+- Char interdit dans la map => OK
+- Map \n => OK

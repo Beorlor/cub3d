@@ -1,0 +1,121 @@
+
+PLAN :
+Détection du mouvement de la souris :
+
+    - mlx_hook(game->win, MotionNotify, PointerMotionMask, handle_mouse_movement, 
+    game); configure le hook pour détecter les mouvements de la souris.
+    - La fonction handle_mouse_movement est appelée chaque fois que la souris est 
+    déplacée. Elle calcule la différence de position (dx) depuis le dernier 
+    mouvement et ajuste l'angle de vue du joueur en conséquence.
+
+Rotation du joueur :
+
+    - La fonction rotate_player ajuste les vecteurs directionnels du joueur 
+    (dir_x, dir_y) et le plan de la caméra (plane_x, plane_y) en fonction de l'angle calculé.
+
+Sensibilité de la souris :
+
+    - Le facteur de multiplication 0.003 dans double angle = dx * 0.003; peut être 
+    ajusté pour changer la sensibilité de la souris. Augmentez ce nombre pour une 
+    rotation plus rapide et réduisez-le pour une rotation plus lente.
+
+
+--------- Exemple détaillé --------
+
+Imaginons les mouvements suivants de la souris sur l'axe x :
+
+    1. Premier appel :
+        - x = 100
+        - last_x = -1 (initialisé)
+        - if (last_x == -1) last_x = x; -> last_x devient 100
+        - dx n'est pas calculé lors du premier appel car last_x vient juste d'être initialisé
+        - last_x est mis à jour à 100
+
+    2. Deuxième appel :
+        - x = 120
+        - last_x = 100 (de l'appel précédent)
+        - int dx = x - last_x; -> dx = 120 - 100 = 20
+        - last_x = x; -> last_x devient 120
+
+    3. Troisième appel :
+        - x = 130
+        - last_x = 120 (de l'appel précédent)
+        - int dx = x - last_x; -> dx = 130 - 120 = 10
+        - last_x = x; -> last_x devient 130
+
+
+// Gestion des mouvements de la souris
+int handle_mouse_movement(int x, int y, t_game *game)
+{
+    static int last_x = -1; // Conserve la dernière position x de la souris entre les appels
+
+    // Si c'est le premier appel, initialise last_x à la position actuelle de la souris
+    if (last_x == -1)
+        last_x = x;
+
+    // Calcul de la différence de position de la souris
+    int dx = x - last_x;
+
+    // Mise à jour de last_x pour le prochain appel
+    last_x = x;
+
+    // Ajuster l'angle de rotation basé sur la différence de position de la souris
+    double angle = dx * 0.003; // Ajustez ce facteur pour la sensibilité
+
+    // Appliquer la rotation au joueur
+    rotate_player(game, angle);
+
+    return (0);
+}
+
+------- EXPLICATIONS ------
+
+Cette fonction est appelée chaque fois que la souris se déplace dans la fenêtre du 
+jeu. Elle gère la rotation de la vue du joueur en fonction du mouvement horizontal 
+de la souris (axe x).
+
+Détails de la fonction :
+
+    1. Initialisation de last_x :
+        - static int last_x = -1;
+        Déclare une variable last_x qui conserve sa valeur entre les appels de la 
+        fonction. Elle est initialisée à -1.
+        - if (last_x == -1) last_x = x;
+        Lors du premier appel, last_x est mis à jour pour prendre la valeur actuelle 
+        de x. Cela permet de définir une position de référence pour calculer les 
+        mouvements suivants.
+
+    2. Calcul de la différence de position de la souris :
+        - int dx = x - last_x;
+        Calcule la différence entre la position actuelle de la souris et la dernière 
+        position enregistrée (dx). Cette différence est utilisée pour déterminer la 
+        quantité de rotation à appliquer à la vue du joueur.
+
+    3. Mise à jour de last_x :
+        - last_x = x;
+        Met à jour last_x avec la position actuelle de la souris pour le prochain 
+        appel.
+
+    4. Calcul et application de la rotation :
+        - double angle = dx * 0.003;
+        Convertit la différence de position de la souris en un angle de rotation. 
+        Le facteur de multiplication (0.003) peut être ajusté pour changer la 
+        sensibilité de la rotation.
+        - rotate_player(game, angle);
+        Appelle la fonction rotate_player pour appliquer la rotation à la vue du 
+        
+
+---------- Fonction mlx_hook -------------
+
+La fonction mlx_hook est utilisée pour configurer des gestionnaires d'événements 
+dans la bibliothèque MiniLibX. Elle permet de spécifier quelle fonction doit être 
+appelée en réponse à différents types d'événements.
+
+Exemple de configuration des gestionnaires d'événements :
+
+- mlx_hook(game->win, MotionNotify, PointerMotionMask, handle_mouse_movement, game);
+
+Cette ligne de code configure MiniLibX pour appeler handle_mouse_movement chaque 
+fois qu'un événement de mouvement de la souris (MotionNotify) est détecté dans la 
+fenêtre du jeu. Le troisième paramètre, PointerMotionMask, spécifie que les 
+mouvements de la souris doivent être surveillés.
