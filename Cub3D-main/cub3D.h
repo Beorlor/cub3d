@@ -44,6 +44,10 @@
 # define SZ 32
 # define ON_DESTROY 17
 
+# define M_SIZE 12 // Taille mini-map (en nb de tuiles)
+# define T_SIZE 6 // Taille d'une tuile (en pixels)
+
+
 // #define KEY_ESC     65307  // Échap (Escape)
 // #define KEY_UP      65362  // Flèche haut
 // #define KEY_DOWN    65364  // Flèche bas
@@ -64,6 +68,18 @@ typedef enum s_texture_index
 	WEST = 2,
 	SOUTH = 3
 }	t_texture_index;
+
+typedef enum s_keys_index
+{
+	W_INDEX = 0,
+	A_INDEX = 1,
+	S_INDEX = 2,
+	D_INDEX = 3,
+	LEFT_INDEX = 4,
+	RIGHT_INDEX = 5,
+	UP_INDEX = 6,
+	DOWN_INDEX = 7
+}	t_keys_index;
 
 typedef struct s_input
 {
@@ -125,8 +141,10 @@ typedef struct s_game
 	t_color		floor;
 	t_color		ceiling;
 	t_input		input;
+	t_texture	mini_map;
 	char		*texture_paths[4];
 	int			running;
+	int			touch_state[6];
 }	t_game;
 
 // UTILS
@@ -204,12 +222,27 @@ int		game_loop(t_game *game);
 int		handle_input(t_game *game);
 int		manage_keyrelease(int keycode, t_game *game);
 int		manage_keypress(int keycode, t_game *game);
+void	is_action(t_game *game);
 
 // PLAYER POSITION
 void	update_position(t_game *game, double move_x, double move_y);
 int		is_outside(t_game *game, double x, double y);
 void	check_map_path(double x, double y, t_game *game);
 void	rotate_player(t_game *game, double angle);
-int	manage_mouse_movement(int x, int y, t_game *game);
+// void	rotate_player(t_game *game, int direction);
+int		manage_mouse_movement(int x, int y, t_game *game);
+
+// DISPLAY
+int	display_each_frame(t_game *game);
+
+// MANAGE MINI_MAP
+void	render_mini_map(t_game *game, t_texture *frame);
+void    draw_mini_map(t_game *game, t_texture *mini_map);
+void    draw(t_texture *img, int x, int y, int color);
+void    draw_player(t_game *game, t_texture *mini_map);
+int		is_wall(t_game *game, int map_x, int map_y);
+void    draw_view_direction(t_game *game, t_texture *mini_map);
+void my_mlx_pixel_put(t_texture *img, int x, int y, int color);
+
 
 #endif

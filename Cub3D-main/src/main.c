@@ -43,7 +43,7 @@ void	create_window(t_game *game)
 		printf("Mlx has not been set up\n");
 		return ;
 	}
-	game->win = mlx_new_window(game->mlx, 500, 500,
+	game->win = mlx_new_window(game->mlx, 800, 800,
 			"Cub3d - A portail's world");
 	if (!game->win)
 	{
@@ -51,13 +51,14 @@ void	create_window(t_game *game)
 		printf("Could not create mlx window\n");
 		return ;
 	}
-	mlx_hook(game->win, KeyPress, KeyPressMask, manage_keypress, game);
-	// mlx_hook(game->win, 3, 1L << 1, manage_keyrelease, game);
+	mlx_hook(game->win, 2, 1L << 0, manage_keypress, game);
+	mlx_hook(game->win, 3, 1L << 1, manage_keyrelease, game);
 	mlx_hook(game->win, 17, KeyPressMask, free_all2, game);
-	// mlx_loop_hook(game->mlx, render_frame, game);
+	mlx_loop_hook(game->mlx, display_each_frame, game);
 	mlx_hook(game->win, MotionNotify, PointerMotionMask, manage_mouse_movement,
 		game);
-	mlx_do_key_autorepeaton(game->mlx);
+	mlx_do_key_autorepeatoff(game->mlx);
+	// MLX REPEAT OFF PUIS ON A L'EXIT
 	mlx_loop(game->mlx);
 }
 //TEST WITH KeyPressMask if it works !
@@ -75,7 +76,7 @@ int	main(int argc, char *argv[])
 	if (argc != 2)
 		return (printf("Wrong nb of arguments\n"), 1);
 	map = ft_strdup(argv[1]);
-	if (map == NULL)
+	if (!map)
 		return (printf("There is no map\n"), 1);
 	game.mlx = mlx_init();
 	if (!game.mlx)

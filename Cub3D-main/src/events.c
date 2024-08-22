@@ -6,60 +6,82 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 18:16:36 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/12 19:03:01 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3D.h"
 
-// Maybe put a condition to be sure that we are in the tab. 
-// int	manage_keypress(int keycode, t_game *game)
-// {
-// 	if (keycode >= 0 && keycode < 256)
-// 		game->input.keys[keycode] = 1;
-// 	printf("Key pressed: %d\n", keycode);
-// 	return (0);
-// }
-
-// if (keycode == KEY_UP)
-	// 	move_forward(game);
-	// else if (keycode == KEY_DOWN)
-	// 	move_backward(game);
 int	manage_keypress(int keycode, t_game *game)
 {
 	if (keycode == KEY_ESC)
 		free_all2(game);
 	else if (keycode == KEY_W)
-	{
-		printf("LOL\n");
-		update_position(game, game->player.dir_x * game->player.speed,
-			game->player.dir_y * game->player.speed);
-	}
+		game->touch_state[W_INDEX] = 1;
 	else if (keycode == KEY_A)
-		update_position(game, game->player.dir_y * game->player.speed,
-			-game->player.dir_x * game->player.speed);
+		game->touch_state[A_INDEX] = 1;
 	else if (keycode == KEY_S)
-		update_position(game, -game->player.dir_x * game->player.speed,
-			-game->player.dir_y * game->player.speed);
+		game->touch_state[S_INDEX] = 1;
 	else if (keycode == KEY_D)
-		update_position(game, -game->player.dir_y * game->player.speed,
-			game->player.dir_x * game->player.speed);
+		game->touch_state[D_INDEX] = 1;
 	else if (keycode == KEY_LEFT)
-		rotate_player(game, game->player.rot_speed);
+		game->touch_state[LEFT_INDEX] = 1;
 	else if (keycode == KEY_RIGHT)
-		rotate_player(game, -game->player.rot_speed);
-	printf("Key pressed: %d\n", keycode);
+		game->touch_state[RIGHT_INDEX] = 1;
 	return (0);
 }
 
-// if (keycode >= 0 && keycode < 256)
-	// 	game->input.keys[keycode] = 0;
-	// printf("Key released: %d\n", keycode);
 int	manage_keyrelease(int keycode, t_game *game)
 {
-	(void)keycode;
-	(void)game;
+	if (keycode == KEY_W)
+		game->touch_state[W_INDEX] = 0;
+	else if (keycode == KEY_A)
+		game->touch_state[A_INDEX] = 0;
+	else if (keycode == KEY_S)
+		game->touch_state[S_INDEX] = 0;
+	else if (keycode == KEY_D)
+		game->touch_state[D_INDEX] = 0;
+	else if (keycode == KEY_LEFT)
+		game->touch_state[LEFT_INDEX] = 0;
+	else if (keycode == KEY_RIGHT)
+		game->touch_state[RIGHT_INDEX] = 0;
 	return (0);
+}
+
+// void	is_action(t_game *game)
+// {
+// 	if (game->touch_state[W_INDEX])
+// 		update_position(game, game->player.dir_x * game->player.speed,
+// 			game->player.dir_y * game->player.speed);
+// 	else if (game->touch_state[A_INDEX])
+// 		update_position(game, game->player.dir_y * game->player.speed,
+// 			-game->player.dir_x * game->player.speed);
+// 	else if (game->touch_state[S_INDEX])
+// 		update_position(game, -game->player.dir_x * game->player.speed,
+// 			-game->player.dir_y * game->player.speed);
+// 	else if (game->touch_state[D_INDEX])
+// 		update_position(game, -game->player.dir_y * game->player.speed,
+// 			game->player.dir_x * game->player.speed);
+// 	else if (game->touch_state[LEFT_INDEX])
+// 		rotate_player(game, -1);
+// 	else if (game->touch_state[RIGHT_INDEX])
+// 		rotate_player(game, 1);
+// }
+
+void	is_action(t_game *game)
+{
+	if (game->touch_state[W_INDEX])
+		update_position(game, game->player.dir_x, game->player.dir_y);
+	else if (game->touch_state[A_INDEX])
+		update_position(game, -game->player.plane_x, -game->player.plane_y);
+	else if (game->touch_state[S_INDEX])
+		update_position(game, -game->player.dir_x, -game->player.dir_y);
+	else if (game->touch_state[D_INDEX])
+		update_position(game, game->player.plane_x, game->player.plane_y);
+	else if (game->touch_state[LEFT_INDEX])
+		rotate_player(game, 1);
+	else if (game->touch_state[RIGHT_INDEX])
+		rotate_player(game, -1);
 }
 
 int	manage_mouse_movement(int x, int y, t_game *game)
@@ -84,8 +106,3 @@ int	manage_mouse_movement(int x, int y, t_game *game)
 	printf("Plane: plane_x = %f, plane_y = %f\n", game->player.plane_x, game->player.plane_y);
 	return (0);
 }
-
-// void	render_frame(t_game *game)
-// {
-
-// }

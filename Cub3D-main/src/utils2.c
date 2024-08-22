@@ -42,6 +42,7 @@ int	free_all2(t_game *game)
 	int	i;
 
 	printf("OK free \n");
+	mlx_do_key_autorepeatoff(game->mlx);
 	if (game->map.map)
 	{
 		i = 0;

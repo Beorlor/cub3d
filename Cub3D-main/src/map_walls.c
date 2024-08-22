@@ -27,11 +27,12 @@ char	**get_map(t_game *game)
 	if (!map)
 		return (printf("Can't malloc the map\n"), NULL);
 	i = 0;
-	while (game->map.map[i])
+	while (i < game->map.height)
 	{
 		map[i] = ft_strdup(game->map.map[i]);
 		i++;
 	}
+	map[i] = NULL; // TO CHECK !!
 	return (map);
 }
 
@@ -44,7 +45,7 @@ int	are_walls_valid(t_game *game)
 	if (map == NULL)
 		return (printf("Can't copy map\n"), 1);
 	if (flood_fill(game, map, game->player.x, game->player.y) == 1)
-		return (printf("Map is not surrounded by walls\n"), 1);
+		return (printf("Map is not surrounded by walls\n"), 1); // Map to free !
 	i = 0;
 	while (map[i])
 	{
