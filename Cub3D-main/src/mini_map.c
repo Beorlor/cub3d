@@ -1,11 +1,12 @@
 
 #include "../cub3D.h"
 
-void draw_pixel(t_texture *mini_map, int x, int y, int color)
+void draw_pixel(t_texture *img, int x, int y, int color)
 {
-    if (x >= 0 && x < mini_map->width && y >= 0 && y < mini_map->height)
+    if (x >= 0 && x < img->width && y >= 0 && y < img->height) // Check bounds
     {
-        mini_map->addr[y * mini_map->width + x] = color;
+        char *dst = (char *)img->addr + (y * img->size_line + x * (img->pixel_bits / 8));
+        *(unsigned int *)dst = color;
     }
 }
 
@@ -22,6 +23,10 @@ void draw_mini_map(t_game *game)
             // Calculate corresponding map coordinates
             map_x = (int)((game->player.x - game->mini_map.width / 2 / T_SIZE) + x / T_SIZE);
             map_y = (int)((game->player.y - game->mini_map.height / 2 / T_SIZE) + y / T_SIZE);
+
+            //printf("Map Coordinates: map_x = %d, map_y = %d, for pixel x = %d, y = %d\n", map_x, map_y, x, y);
+			//printf("Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
+
 
             // Check map boundaries and draw walls or empty spaces
             if (map_x >= 0 && map_x < game->map.width && map_y >= 0 && map_y < game->map.height)

@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/26 00:37:13 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/26 00:51:06 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ void update_position(t_game *game, double move_x, double move_y)
     {
         game->player.y = new_y;
     }
+
+	printf("Updated Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
 }
 
 
