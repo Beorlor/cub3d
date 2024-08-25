@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:01:45 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/25 21:08:53 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,10 @@ void	is_action(t_game *game)
 int	manage_mouse_movement(int x, t_game *game)
 {
     int dx;
+
+	//TODO this was to stop fonction from working
+    return 0;  // Prevent using uninitialized or null values
+
 
     // Calcul du déplacement de la souris en X
     dx = x - game->input.last_mouse_x;
