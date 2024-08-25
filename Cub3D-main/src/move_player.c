@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 19:54:57 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/26 00:11:17 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,23 +116,20 @@ void	update_position(t_game *game, double move_x, double move_y)
 // 	// printf("plane_y : %f\n", game->player.plane_y);
 // }
 
-// events.c
-void	rotate_player(t_game *game, double angle)
+void rotate_player(t_game *game, double angle)
 {
-    double	old_dir_x;
-    double	old_plane_x;
+    // Save old direction values
+    double old_dir_x = game->player.dir_x;
+    double old_plane_x = game->player.plane_x;
 
-    // Sauvegarde des valeurs actuelles
-    old_dir_x = game->player.dir_x;
-    old_plane_x = game->player.plane_x;
-
-    // Appliquer la rotation sur les vecteurs direction et plan
-    game->player.dir_x = game->player.dir_x * cos(angle) - game->player.dir_y * sin(angle);
+    // Apply rotation using trigonometric functions
+    game->player.dir_x = old_dir_x * cos(angle) - game->player.dir_y * sin(angle);
     game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
 
-    game->player.plane_x = game->player.plane_x * cos(angle) - game->player.plane_y * sin(angle);
+    game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
     game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
 }
+
 
 
 // void	rotate_player(t_game *game, int direction)
@@ -165,31 +162,28 @@ void	rotate_player(t_game *game, double angle)
 //     mlx_destroy_image(game->mlx, mini_map.img);
 // }
 
-int	display_each_frame(t_game *game)
+int display_each_frame(t_game *game)
 {
-	t_texture frame;
+    // Clear the frame
+    t_texture frame;
+    frame.width = game->win_width;
+    frame.height = game->win_height;
+    frame.img = mlx_new_image(game->mlx, frame.width, frame.height);
+    frame.addr = (int *)mlx_get_data_addr(frame.img, &frame.pixel_bits, &frame.size_line, &frame.endian);
 
-	frame.width = game->win_width;
-	frame.height = game->win_height;
-	frame.img = mlx_new_image(game->mlx, frame.width, frame.height);
-	if (!frame.img)
-    	return (printf("Failed to create image\n"), 1);
-	frame.addr = (int *)mlx_get_data_addr(frame.img, &frame.pixel_bits, &frame.size_line, &frame.endian);
-	if (!frame.addr)
-	{
-   		printf("Failed to get data address\n");
-    	mlx_destroy_image(game->mlx, frame.img);
-    	return (1);
-	}
-	draw_mini_map(game, &game->mini_map);
-	draw_player(game, &game->mini_map);
-	if (mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10) < 0)
-	{
-        printf("Error: mlx_put_image_to_window failed for mini_map\n");
-        mlx_destroy_image(game->mlx, frame.img);
-        return (1);
- 	}
-	mlx_destroy_image(game->mlx, frame.img);
-	is_action(game);
-	return (0);
+    // Draw the minimap and player on the frame
+    draw_mini_map(game);
+
+    // Render the minimap to the window, with a larger size
+    mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10); // Position on the window
+
+    // Clean up the frame resources
+    mlx_destroy_image(game->mlx, frame.img);
+
+    // Handle player movement and actions
+    is_action(game);
+
+    return 0;
 }
+
+

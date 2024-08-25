@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 21:08:53 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/26 00:30:14 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,18 +68,53 @@ int	manage_keyrelease(int keycode, t_game *game)
 // 		rotate_player(game, 1);
 // }
 
-// events.c
-void	is_action(t_game *game)
+// Function to try moving the player and handle collisions
+void try_move(t_game *game, double move_x, double move_y)
 {
-    if (game->touch_state[W_INDEX])
-        update_position(game, game->player.dir_x, game->player.dir_y);  // Avancer dans la direction du regard
-    if (game->touch_state[S_INDEX])
-        update_position(game, -game->player.dir_x, -game->player.dir_y);  // Reculer
-    if (game->touch_state[A_INDEX])
-        update_position(game, -game->player.plane_x, -game->player.plane_y);  // Aller à gauche
-    if (game->touch_state[D_INDEX])
-        update_position(game, game->player.plane_x, game->player.plane_y);  // Aller à droite
+    double new_x = game->player.x + move_x;
+    double new_y = game->player.y + move_y;
+
+    // Check collision at the player's center
+    if (!is_wall(game, new_x, game->player.y)) // Move along X axis if no collision
+    {
+        game->player.x = new_x;
+    }
+    if (!is_wall(game, game->player.x, new_y)) // Move along Y axis if no collision
+    {
+        game->player.y = new_y;
+    }
 }
+
+void is_action(t_game *game)
+{
+    double move_x = 0;
+    double move_y = 0;
+
+    if (game->touch_state[W_INDEX]) // Move forward
+    {
+        move_x += game->player.dir_x + game->player.speed;
+        move_y += game->player.dir_y + game->player.speed;
+    }
+    if (game->touch_state[S_INDEX]) // Move backward
+    {
+        move_x -= game->player.dir_x + game->player.speed;
+        move_y -= game->player.dir_y + game->player.speed;
+    }
+    if (game->touch_state[A_INDEX]) // Strafe left
+    {
+        move_x -= game->player.plane_x + game->player.speed;
+        move_y -= game->player.plane_y + game->player.speed;
+    }
+    if (game->touch_state[D_INDEX]) // Strafe right
+    {
+        move_x += game->player.plane_x + game->player.speed;
+        move_y += game->player.plane_y + game->player.speed;
+    }
+
+    // Check for wall collisions
+    try_move(game, move_x, move_y);
+}
+
 
 
 // events.c

@@ -20,7 +20,7 @@ void	init_player(t_player *player)
 	player->dir_y = 0;
 	player->plane_x = 0;
 	player->plane_y = 0.66;
-	player->speed = 0.1;
+	player->speed = 0.05;
 	player->rot_speed = 0.04;
 }
 // speed : vitesse du player en pixels.
@@ -53,23 +53,23 @@ void	init_map(t_map *map)
 
 void init_mini_map(t_game *game)
 {
-    game->mini_map.width = M_SIZE * T_SIZE;
-    game->mini_map.height = M_SIZE * T_SIZE;
-	if (game->mini_map.width <= 0 || game->mini_map.height <= 0) {
+    game->mini_map.width = MINIMAP_WIDTH;
+    game->mini_map.height = MINIMAP_HEIGHT;
+
+    // Check for invalid dimensions and handle errors
+    if (game->mini_map.width <= 0 || game->mini_map.height <= 0) {
         printf("Error: Invalid mini_map dimensions\n");
         free_all2(game);
         return;
     }
     game->mini_map.img = mlx_new_image(game->mlx, game->mini_map.width, game->mini_map.height);
-    if (!game->mini_map.img)
-    {
+    if (!game->mini_map.img) {
         printf("Error: Failed to create mini_map image\n");
         free_all2(game);
     }
 
     game->mini_map.addr = (int *)mlx_get_data_addr(game->mini_map.img, &game->mini_map.pixel_bits, &game->mini_map.size_line, &game->mini_map.endian);
-    if (!game->mini_map.addr)
-    {
+    if (!game->mini_map.addr) {
         printf("Error: Failed to get mini_map data address\n");
         mlx_destroy_image(game->mlx, game->mini_map.img);
         free_all2(game);
