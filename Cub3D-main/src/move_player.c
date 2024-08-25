@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/26 00:11:17 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/26 00:37:13 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,22 +72,20 @@ int	is_outside(t_game *game, double x, double y)
 // 	printf("New position y : %f\n", game->player.y);
 // }
 
-void	update_position(t_game *game, double move_x, double move_y)
+
+void update_position(t_game *game, double move_x, double move_y)
 {
-    double	new_x;
-    double	new_y;
+    double new_x = game->player.x + move_x;
+    double new_y = game->player.y + move_y;
 
-    // Calcul des nouvelles coordonnées en fonction de la direction du joueur
-    new_x = game->player.x + move_x * game->player.speed;
-    new_y = game->player.y + move_y * game->player.speed;
-
-    // Vérification des collisions avant d'assigner les nouvelles coordonnées
-    if (!is_wall(game, new_x, game->player.y)) {
-        game->player.x = new_x; // Mise à jour de la position en X si pas de collision
+    // Check for wall collisions and update player position accordingly
+    if (!is_wall(game, new_x, game->player.y))
+    {
+        game->player.x = new_x;
     }
-
-    if (!is_wall(game, game->player.x, new_y)) {
-        game->player.y = new_y; // Mise à jour de la position en Y si pas de collision
+    if (!is_wall(game, game->player.x, new_y))
+    {
+        game->player.y = new_y;
     }
 }
 
@@ -118,17 +116,17 @@ void	update_position(t_game *game, double move_x, double move_y)
 
 void rotate_player(t_game *game, double angle)
 {
-    // Save old direction values
     double old_dir_x = game->player.dir_x;
     double old_plane_x = game->player.plane_x;
 
-    // Apply rotation using trigonometric functions
+    // Apply rotation using cosine and sine for smooth rotation
     game->player.dir_x = old_dir_x * cos(angle) - game->player.dir_y * sin(angle);
     game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
 
     game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
     game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
 }
+
 
 
 
