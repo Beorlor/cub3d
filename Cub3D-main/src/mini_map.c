@@ -1,37 +1,30 @@
 
 #include "../cub3D.h"
 
-void    draw_mini_map(t_game *game, t_texture *mini_map)
+void	draw_mini_map(t_game *game, t_texture *mini_map)
 {
-    double  x;
-    double  y;
-    double map_x;
-    double map_y;
+    int x, y;
+    int map_x, map_y;
 
-    y = 0;
-    while (y < M_SIZE)
+    for (y = 0; y < M_SIZE; y++)
     {
-        x = 0;
-        while (x < M_SIZE)
+        for (x = 0; x < M_SIZE; x++)
         {
-            map_x = game->player.x - (M_SIZE / 2) + x;
-            map_y = game->player.y - (M_SIZE / 2) + y;
+            map_x = (int)(game->player.x - M_SIZE / 2 + x);
+            map_y = (int)(game->player.y - M_SIZE / 2 + y);
+
             if (map_x >= 0 && map_x < game->map.width && map_y >= 0 && map_y < game->map.height)
             {
-                if (game->map.map[(int)map_y][(int)map_x] == '1')
+                if (game->map.map[map_y][map_x] == '1')
                     draw(mini_map, x, y, 0xFFFFFF);
-                else if (game->map.map[(int)map_y][(int)map_x] == '0' || game->map.map[(int)map_y][(int)map_x] == 'N'
-                    || game->map.map[(int)map_y][(int)map_x] == 'E' || game->map.map[(int)map_y][(int)map_x] == 'W'
-                    || game->map.map[(int)map_y][(int)map_x] == 'S')
-                    draw(mini_map, (int)x, (int)y, 0x888888);
                 else
-                    draw(mini_map, (int)x, (int)y, 0x000000);
+                    draw(mini_map, x, y, 0x888888);
             }
             else
-                draw(mini_map, (int)x, (int)y, 0x555555); // Outside of map
-            x++;
+            {
+                draw(mini_map, x, y, 0x555555); // Hors de la carte
+            }
         }
-        y++;
     }
 }
 
@@ -58,44 +51,34 @@ void    draw(t_texture *img, int x, int y, int color)
     }
 }
 
-void    draw_player(t_game *game, t_texture *mini_map)
+void	draw_player(t_game *game, t_texture *mini_map)
 {
-    double player_x;
-    double player_y;
-    double pixel_x;
-    double pixel_y;
-    int i;
-    int j;
+    int player_x = M_SIZE / 2;
+    int player_y = M_SIZE / 2;
 
-    player_x = M_SIZE / 2 * T_SIZE;
-    player_y = M_SIZE / 2 * T_SIZE;
-    i = 0;
-    while (i < 6) // Parcourir 6 pixels pour former le square (height)
+    for (int i = -2; i <= 2; i++)
     {
-        j = 0;
-        while (j < 6) // (width)
+        for (int j = -2; j <= 2; j++)
         {
-            pixel_x = player_x + j;
-            pixel_y = player_y + i;
-            if (pixel_x >= 0 && pixel_x < mini_map->width && pixel_y >= 0 && pixel_y < mini_map->height)
-                my_mlx_pixel_put(mini_map, (int)pixel_x, (int)pixel_y, 0xFF0000); // Red for player
-            j++;
+            draw(mini_map, player_x + j, player_y + i, 0xFF0000); // Rouge pour le joueur
         }
-        i++;
     }
     draw_view_direction(game, mini_map);
 }
 
 
+// mini_map.c
 int is_wall(t_game *game, int map_x, int map_y)
 {
-
     if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height)
-        return (1);
-    else if (game->map.map[map_y][map_x] == '1')
-        return (1);
-    return (0);
+        return 1;
+
+    if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == ' ')
+        return 1;
+
+    return 0;
 }
+
 
 void    draw_view_direction(t_game *game, t_texture *mini_map)
 {
@@ -138,7 +121,7 @@ void my_mlx_pixel_put(t_texture *img, int x, int y, int color)
 
 
 /*
-FAIRE UN DEUXIEME JEU A PART : 
+FAIRE UN DEUXIEME JEU A PART :
 - Prendre map parsé
 - Prendre position joueur
 - Quand portail passé on réaffiche tout (refaire fonction rendering)

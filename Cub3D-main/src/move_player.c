@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_player.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/12 18:52:29 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:54:57 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,25 +74,21 @@ int	is_outside(t_game *game, double x, double y)
 
 void	update_position(t_game *game, double move_x, double move_y)
 {
-	double	new_x;
-	double	new_y;
+    double	new_x;
+    double	new_y;
 
-	new_x = game->player.x + move_x * game->player.speed;
-	new_y = game->player.y + move_y * game->player.speed;
-	if (!is_outside(game, new_x, new_y))
-	{
-		game->player.x = new_x;
-		game->player.y = new_y;
-	}
-	else
-	{
-		if (!is_outside(game, new_x, game->player.y))
-			game->player.x = new_x;
-		if (!is_outside(game, game->player.x, new_y))
-			game->player.y = new_y;
-	}
-	// printf("New position x : %f\n", game->player.x);
-	// printf("New position y : %f\n", game->player.y);
+    // Calcul des nouvelles coordonnées en fonction de la direction du joueur
+    new_x = game->player.x + move_x * game->player.speed;
+    new_y = game->player.y + move_y * game->player.speed;
+
+    // Vérification des collisions avant d'assigner les nouvelles coordonnées
+    if (!is_wall(game, new_x, game->player.y)) {
+        game->player.x = new_x; // Mise à jour de la position en X si pas de collision
+    }
+
+    if (!is_wall(game, game->player.x, new_y)) {
+        game->player.y = new_y; // Mise à jour de la position en Y si pas de collision
+    }
 }
 
 
@@ -120,24 +116,24 @@ void	update_position(t_game *game, double move_x, double move_y)
 // 	// printf("plane_y : %f\n", game->player.plane_y);
 // }
 
+// events.c
 void	rotate_player(t_game *game, double angle)
 {
-	double	old_dir_x;
-	double	old_plane_x;
+    double	old_dir_x;
+    double	old_plane_x;
 
-	old_dir_x = game->player.dir_x;
-	old_plane_x = game->player.plane_x;
+    // Sauvegarde des valeurs actuelles
+    old_dir_x = game->player.dir_x;
+    old_plane_x = game->player.plane_x;
 
-	// Multiplier par -1 pour corriger l'inversion
-	angle *= -1 * game->player.rot_speed;
-	printf("After angle : %f\n", angle);
+    // Appliquer la rotation sur les vecteurs direction et plan
+    game->player.dir_x = game->player.dir_x * cos(angle) - game->player.dir_y * sin(angle);
+    game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
 
-	game->player.dir_x = old_dir_x * cos(angle) - game->player.dir_y * sin(angle);
-	game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
-
-	game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
-	game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
+    game->player.plane_x = game->player.plane_x * cos(angle) - game->player.plane_y * sin(angle);
+    game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
 }
+
 
 // void	rotate_player(t_game *game, int direction)
 // {

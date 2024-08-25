@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parser_description_file.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:39:43 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 16:26:41 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:38:24 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cub3D.h"
+#include "../../cub3D.h"
 
 // Test if line is well incremented when digit
 int	parse_rgb(char *line, int *r, int *g, int *b)

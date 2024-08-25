@@ -230,7 +230,7 @@ int		is_outside(t_game *game, double x, double y);
 void	check_map_path(double x, double y, t_game *game);
 void	rotate_player(t_game *game, double angle);
 // void	rotate_player(t_game *game, int direction);
-int		manage_mouse_movement(int x, int y, t_game *game);
+int	manage_mouse_movement(int x, t_game *game);
 
 // DISPLAY
 int	display_each_frame(t_game *game);
@@ -240,7 +240,7 @@ void	render_mini_map(t_game *game, t_texture *frame);
 void    draw_mini_map(t_game *game, t_texture *mini_map);
 void    draw(t_texture *img, int x, int y, int color);
 void    draw_player(t_game *game, t_texture *mini_map);
-int		is_wall(t_game *game, int map_x, int map_y);
+int is_wall(t_game *game, int map_x, int map_y);
 void    draw_view_direction(t_game *game, t_texture *mini_map);
 void my_mlx_pixel_put(t_texture *img, int x, int y, int color);
 

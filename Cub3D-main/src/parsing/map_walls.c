@@ -3,21 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   map_walls.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:51:29 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 15:52:28 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:38:22 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cub3D.h"
+#include "../../cub3D.h"
 
-	// i = 0;
-	// while (map[i])
-	// {
-	// 	printf("Map[i] : %s\n", map[i]);
-	// 	i++;
-	// }
 char	**get_map(t_game *game)
 {
 	int		i;

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   eof_error.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:45:33 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 15:46:52 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:38:00 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cub3D.h"
+#include "../../cub3D.h"
 
 int	process_map(char *line, int fd, int map_ended)
 {

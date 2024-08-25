@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   file_errors.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:25:48 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 16:25:18 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:38:07 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cub3D.h"
+#include "../../cub3D.h"
 
 // Manage if we've a doublon in start position & orientation of the player.
 // So : NO/SO/WE/EA

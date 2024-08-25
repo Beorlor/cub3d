@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   fill_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:33:07 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 16:28:07 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:38:15 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../cub3D.h"
+#include "../../cub3D.h"
 
 void	loop_to_fill_map(t_game *game, int fd, int *textures, int *rgb)
 {

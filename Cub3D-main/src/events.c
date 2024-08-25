@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   events.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/12 19:03:01 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:01:45 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,41 +68,34 @@ int	manage_keyrelease(int keycode, t_game *game)
 // 		rotate_player(game, 1);
 // }
 
+// events.c
 void	is_action(t_game *game)
 {
-	if (game->touch_state[W_INDEX])
-		update_position(game, game->player.dir_x, game->player.dir_y);
-	else if (game->touch_state[A_INDEX])
-		update_position(game, -game->player.plane_x, -game->player.plane_y);
-	else if (game->touch_state[S_INDEX])
-		update_position(game, -game->player.dir_x, -game->player.dir_y);
-	else if (game->touch_state[D_INDEX])
-		update_position(game, game->player.plane_x, game->player.plane_y);
-	else if (game->touch_state[LEFT_INDEX])
-		rotate_player(game, 1);
-	else if (game->touch_state[RIGHT_INDEX])
-		rotate_player(game, -1);
+    if (game->touch_state[W_INDEX])
+        update_position(game, game->player.dir_x, game->player.dir_y);  // Avancer dans la direction du regard
+    if (game->touch_state[S_INDEX])
+        update_position(game, -game->player.dir_x, -game->player.dir_y);  // Reculer
+    if (game->touch_state[A_INDEX])
+        update_position(game, -game->player.plane_x, -game->player.plane_y);  // Aller à gauche
+    if (game->touch_state[D_INDEX])
+        update_position(game, game->player.plane_x, game->player.plane_y);  // Aller à droite
 }
 
-int	manage_mouse_movement(int x, int y, t_game *game)
+
+// events.c
+int	manage_mouse_movement(int x, t_game *game)
 {
-	double	angle;
-	int		dx;
+    int dx;
 
-	(void)y;
-	if (x == game->input.last_mouse_x)
-		game->input.last_mouse_x = x;
-	dx = x - game->input.last_mouse_x;
-	game->input.last_mouse_x = x;
-	angle = dx * 0.003;
-	printf("Before rotation:\n");
-	printf("Mouse dx = %d, Angle = %f\n", dx, angle);
-	printf("Direction: dir_x = %f, dir_y = %f\n", game->player.dir_x, game->player.dir_y);
-	printf("Plane: plane_x = %f, plane_y = %f\n", game->player.plane_x, game->player.plane_y);
-	rotate_player(game, angle);
-	printf("After rotation:\n");
-	printf("Mouse dx = %d, Angle = %f\n", dx, angle);
-	printf("Direction: dir_x = %f, dir_y = %f\n", game->player.dir_x, game->player.dir_y);
-	printf("Plane: plane_x = %f, plane_y = %f\n", game->player.plane_x, game->player.plane_y);
-	return (0);
+    // Calcul du déplacement de la souris en X
+    dx = x - game->input.last_mouse_x;
+    game->input.last_mouse_x = x;
+
+    // Appliquer la rotation en fonction du déplacement de la souris
+    if (dx != 0) {
+        rotate_player(game, -dx * 0.003);  // Ajuster la sensibilité de la souris si nécessaire
+    }
+    return (0);
 }
+
+

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+         #
+#    By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 18:59:35 by jeza              #+#    #+#              #
-#    Updated: 2024/07/29 18:15:36 by jeguerin         ###   ########.fr        #
+#    Updated: 2024/08/25 20:44:32 by jedurand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,12 +20,13 @@ CC := gcc
 CFLAGS := -Wall -Wextra -Werror -Iheaders/ -Iminilibx -g
 
 #Liste des fichiers source.
-SRCS = src/main.c src/parser.c src/init.c src/utils.c src/map_errors.c \
-		src/file_errors.c src/events.c src/init2.c src/utils2.c src/fill_map.c \
-		src/map_utils.c src/parser_description_file.c src/eof_error.c \
-		src/valid_file.c src/map_walls.c src/file_utils.c src/move_player.c \
-		src/mini_map.c \
-		
+SRCS = src/main.c src/events.c src/init.c src/utils.c \
+       src/utils2.c src/init2.c src/move_player.c src/mini_map.c \
+       src/parsing/eof_error.c src/parsing/fill_map.c src/parsing/map_errors.c \
+       src/parsing/map_walls.c src/parsing/parser.c src/parsing/parser_description_file.c \
+       src/parsing/valid_file.c src/parsing/file_errors.c src/parsing/file_utils.c \
+	   src/parsing/map_utils.c
+
 
 LIBFT = Libft/libft.a
 GETNEXTLINE = get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
