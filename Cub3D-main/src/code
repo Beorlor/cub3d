@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/26 00:30:14 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/27 23:07:20 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,59 +84,232 @@ void try_move(t_game *game, double move_x, double move_y)
         game->player.y = new_y;
     }
 }
-
 void is_action(t_game *game)
 {
     double move_x = 0;
     double move_y = 0;
 
+    // Reduce movement speed by using smaller increments
+    double movement_speed = game->player.speed * 0.05; // Adjust this value to reduce speed
+
+    int is_moving = 0;
+
     if (game->touch_state[W_INDEX]) // Move forward
     {
-        move_x += game->player.dir_x + game->player.speed;
-        move_y += game->player.dir_y + game->player.speed;
+        move_x += game->player.dir_x * movement_speed;
+        move_y += game->player.dir_y * movement_speed;
+        is_moving = 1;
     }
     if (game->touch_state[S_INDEX]) // Move backward
     {
-        move_x -= game->player.dir_x + game->player.speed;
-        move_y -= game->player.dir_y + game->player.speed;
+        move_x -= game->player.dir_x * movement_speed;
+        move_y -= game->player.dir_y * movement_speed;
+        is_moving = 1;
     }
     if (game->touch_state[A_INDEX]) // Strafe left
     {
-        move_x -= game->player.plane_x + game->player.speed;
-        move_y -= game->player.plane_y + game->player.speed;
+        move_x -= game->player.plane_x * movement_speed;
+        move_y -= game->player.plane_y * movement_speed;
+        is_moving = 1;
     }
     if (game->touch_state[D_INDEX]) // Strafe right
     {
-        move_x += game->player.plane_x + game->player.speed;
-        move_y += game->player.plane_y + game->player.speed;
+        move_x += game->player.plane_x * movement_speed;
+        move_y += game->player.plane_y * movement_speed;
+        is_moving = 1;
     }
 
     // Check for wall collisions
     try_move(game, move_x, move_y);
+
+    // Adjust the walk offset if the player is moving
+    if (is_moving)
+    {
+        game->frame_count++;
+        game->walk_offset = (int)(sin(game->frame_count * 0.1) * 10); // Adjust the multiplier (10) for stronger effect
+    }
+    else
+    {
+        // Reset walk offset if the player stops moving
+        game->walk_offset = 0;
+        game->frame_count = 0; // Optionally reset the frame count when stopping
+    }
 }
+
 
 
 
 // events.c
-int	manage_mouse_movement(int x, t_game *game)
+// int	manage_mouse_movement(int x, t_game *game)
+// {
+//     int dx;
+
+// 	//TODO this was to stop fonction from working
+//     return 0;  // Prevent using uninitialized or null values
+
+
+//     // Calcul du déplacement de la souris en X
+//     dx = x - game->input.last_mouse_x;
+//     game->input.last_mouse_x = x;
+
+//     // Appliquer la rotation en fonction du déplacement de la souris
+//     if (dx != 0) {
+//         rotate_player(game, -dx * 0.003);  // Ajuster la sensibilité de la souris si nécessaire
+//     }
+//     return (0);
+// }
+
+int	manage_mouse_movement(int x, int y, t_game *game)
 {
-    int dx;
+	double	angle;
+	int		dx;
 
-	//TODO this was to stop fonction from working
-    return 0;  // Prevent using uninitialized or null values
+	(void)y;
+	if (x == game->input.last_mouse_x)
+		game->input.last_mouse_x = x;
+	dx = x - game->input.last_mouse_x;
+	game->input.last_mouse_x = x;
+	angle = dx * 0.003;
+	rotate_player(game, angle);
+	return (0);
+}
 
-
-    // Calcul du déplacement de la souris en X
-    dx = x - game->input.last_mouse_x;
-    game->input.last_mouse_x = x;
-
-    // Appliquer la rotation en fonction du déplacement de la souris
-    if (dx != 0) {
-        rotate_player(game, -dx * 0.003);  // Ajuster la sensibilité de la souris si nécessaire
+int manage_mouse_click(int button, int x, int y, t_game *game)
+{
+    (void)x;
+    (void)y;
+    if (button == 1 || button == 3) // Clic gauche ou droit
+    {
+        if (game->gun_shot == 0) // Si pas de tir en cours
+        {
+            game->gun_shot = 1;
+            game->shot_frame = 0;
+            // create_ball(game, button);
+        }
     }
     return (0);
 }
+#include "../cub3D.h"
 
+void render_scene(t_game *game, t_texture *frame)
+{
+    int x;
+
+    // Variables needed for raycasting
+    double camera_x, ray_dir_x, ray_dir_y;
+    int map_x, map_y;
+    double side_dist_x, side_dist_y;
+    double delta_dist_x, delta_dist_y;
+    double perp_wall_dist;
+    int step_x, step_y;
+    int hit, side;
+
+    // Ceiling and floor colors
+    int ceiling_color = (game->ceiling.r << 16) | (game->ceiling.g << 8) | game->ceiling.b;
+    int floor_color = (game->floor.r << 16) | (game->floor.g << 8) | game->floor.b;
+
+    // Loop through each vertical stripe of the screen
+    for (x = 0; x < game->win_width; x++)
+    {
+        // Calculate ray position and direction
+        camera_x = 2 * x / (double)game->win_width - 1;
+        ray_dir_x = game->player.dir_x + game->player.plane_x * camera_x;
+        ray_dir_y = game->player.dir_y + game->player.plane_y * camera_x;
+
+        // Which box of the map we're in
+        map_x = (int)game->player.x;
+        map_y = (int)game->player.y;
+
+        // Length of ray from current position to next x or y-side
+        delta_dist_x = fabs(1 / ray_dir_x);
+        delta_dist_y = fabs(1 / ray_dir_y);
+
+        // Calculate step and initial side_dist
+        if (ray_dir_x < 0)
+        {
+            step_x = -1;
+            side_dist_x = (game->player.x - map_x) * delta_dist_x;
+        }
+        else
+        {
+            step_x = 1;
+            side_dist_x = (map_x + 1.0 - game->player.x) * delta_dist_x;
+        }
+        if (ray_dir_y < 0)
+        {
+            step_y = -1;
+            side_dist_y = (game->player.y - map_y) * delta_dist_y;
+        }
+        else
+        {
+            step_y = 1;
+            side_dist_y = (map_y + 1.0 - game->player.y) * delta_dist_y;
+        }
+
+        // Perform DDA (Digital Differential Analysis)
+        hit = 0;
+        while (hit == 0)
+        {
+            // Jump to next map square in x or y direction
+            if (side_dist_x < side_dist_y)
+            {
+                side_dist_x += delta_dist_x;
+                map_x += step_x;
+                side = 0;
+            }
+            else
+            {
+                side_dist_y += delta_dist_y;
+                map_y += step_y;
+                side = 1;
+            }
+            // Check if ray has hit a wall
+            if (game->map.map[map_x][map_y] == '1')
+                hit = 1;
+        }
+
+        // Calculate distance to the point of impact
+        if (side == 0)
+            perp_wall_dist = (map_x - game->player.x + (1 - step_x) / 2) / ray_dir_x;
+        else
+            perp_wall_dist = (map_y - game->player.y + (1 - step_y) / 2) / ray_dir_y;
+
+        // Calculate height of line to draw on screen
+        int line_height = (int)(game->win_height / perp_wall_dist);
+
+        // Calculate lowest and highest pixel to fill in current stripe
+        int draw_start = -line_height / 2 + game->win_height / 2 + game->walk_offset;
+        if (draw_start < 0) draw_start = 0;
+        int draw_end = line_height / 2 + game->win_height / 2 + game->walk_offset;
+        if (draw_end >= game->win_height) draw_end = game->win_height - 1;
+
+        // Choose a random color for each wall side (as a placeholder)
+        int wall_color = 0xFFFFFF; // default white
+        if (side == 0)
+        {
+            if (step_x > 0) wall_color = 0xFF0000; // Red for East wall
+            else wall_color = 0x00FF00; // Green for West wall
+        }
+        else
+        {
+            if (step_y > 0) wall_color = 0x0000FF; // Blue for South wall
+            else wall_color = 0xFFFF00; // Yellow for North wall
+        }
+
+        // Draw the ceiling (from top to draw_start)
+		// Instead of using game->mini_map, you should use the frame
+		for (int y = 0; y < draw_start; y++)
+			my_mlx_pixel_put(frame, x, y, ceiling_color);  // Use frame
+
+		// Drawing the wall
+		for (int y = draw_start; y < draw_end; y++)
+			my_mlx_pixel_put(frame, x, y, wall_color);  // Use frame
+
+		// Drawing the floor
+		for (int y = draw_end; y < game->win_height; y++)
+			my_mlx_pixel_put(frame, x, y, floor_color);  // Use frame
+    }
+}
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -146,7 +319,7 @@ int	manage_mouse_movement(int x, t_game *game)
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 09:36:20 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 16:50:30 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/27 12:05:48 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,14 +343,6 @@ void	init_texture(t_texture *texture)
 	texture->height = 0;
 }
 
-// int	i;
-
-	// i = 0;
-	// while (i < 256)
-	// {
-	// 	input->keys[i] = 0;
-	// 	i++;
-	// }
 void	init_input(t_input *input)
 {
 	input->mouse_x = 0;
@@ -235,16 +400,21 @@ void	init_game(t_game *game)
 	game->win_width = 600;
 	game->map.map = NULL;
 	game->running = 1;
+	game->orientation = 0;
 	memset(game->touch_state, 0, sizeof(game->touch_state));
+	game->portal_gun.img = NULL;
+    game->portal_gun.addr = NULL;
+    game->portal_gun.pixel_bits = 0;
+    game->portal_gun.size_line = 0;
+    game->portal_gun.endian = 0;
+	game->gun_shot = 0;
+	game->shot_frame = 0;
+	init_textures(game);
+	init_ball(game);
+	load_portal_gun(game);
+	game->frame_count = 0;
+	game->walk_offset = 0;
 }
-// int	i;
-
-	// i = 0;
-	// while (i < 4)
-	// {
-	// 	game->texture_paths[i] = NULL;
-	// 	i++;
-	// }
 
 void	init_map(t_map *map)
 {
@@ -278,6 +448,49 @@ void init_mini_map(t_game *game)
     }
 }
 
+void	init_ball(t_game *game)
+{
+	int	i;
+
+	i = 0;
+	while (i < 2)
+	{
+		game->ball[i].texture.img = NULL;
+		game->ball[i].texture.addr = NULL;
+		game->ball[i].texture.pixel_bits = 0;
+		game->ball[i].texture.size_line = 0;
+		game->ball[i].texture.endian = 0;
+		game->ball[i].texture.width = 64;
+		game->ball[i].texture.height = 64;
+		game->ball[i].x = 0;
+		game->ball[i].y = 0;
+		game->ball[i].direction_x = 0;
+		game->ball[i].direction_y = 0;
+		game->ball[i].active = 0;
+		i++;
+	}
+	load_ball_textures(game);
+
+}
+
+void	init_textures(t_game *game)
+{
+	int	i;
+
+	i = 0;
+	while (i < 4)
+	{
+		game->textures[i].addr = NULL;
+		game->textures[i].img = NULL;
+		game->textures[i].pixel_bits = 0;
+		game->textures[i].size_line = 0;
+		game->textures[i].endian = 0;
+		game->textures[i].width = 0;
+		game->textures[i].height = 0;
+		i++;
+	}
+}
+
 void	init_cub(t_game *game)
 {
 	init_game(game);
@@ -303,7 +516,7 @@ void	init_cub(t_game *game)
 
 #include "../cub3D.h"
 
-void	create_images(t_game *game)
+void	create_textures(t_game *game)
 {
 	int	i;
 
@@ -338,23 +551,19 @@ void	create_window(t_game *game)
 			"Cub3d - A portail's world");
 	if (!game->win)
 	{
-		mlx_destroy_display(game->mlx);
 		printf("Could not create mlx window\n");
 		return ;
 	}
 	mlx_hook(game->win, 2, 1L << 0, manage_keypress, game);
 	mlx_hook(game->win, 3, 1L << 1, manage_keyrelease, game);
+	mlx_hook(game->win, 4, 1L << 2, manage_mouse_click, game);
 	mlx_hook(game->win, 17, KeyPressMask, free_all2, game);
 	mlx_loop_hook(game->mlx, display_each_frame, game);
 	mlx_hook(game->win, MotionNotify, PointerMotionMask, manage_mouse_movement,
 		game);
 	mlx_do_key_autorepeatoff(game->mlx);
-	// MLX REPEAT OFF PUIS ON A L'EXIT
 	mlx_loop(game->mlx);
 }
-//TEST WITH KeyPressMask if it works !
-// mlx_hook(game->win, KeyPress, KeyPressMask, manage_keypress, game);
-// Manage Keypress
 
 // Init structures
 // Create map
@@ -373,11 +582,11 @@ int	main(int argc, char *argv[])
 	if (!game.mlx)
 		return (printf("Could not start mlx\n"), 1);
 	init_cub(&game);
-	// create_images(&game);
 	read_map(&game, map);
 	malloc_map(&game);
 	fill_map(&game, map);
 	manage_errors(&game, map);
+	// create_textures(&game);
 	create_window(&game);
 	mlx_loop(game.mlx);
 	free(map);
@@ -387,11 +596,12 @@ int	main(int argc, char *argv[])
 
 #include "../cub3D.h"
 
-void draw_pixel(t_texture *mini_map, int x, int y, int color)
+void draw_pixel(t_texture *img, int x, int y, int color)
 {
-    if (x >= 0 && x < mini_map->width && y >= 0 && y < mini_map->height)
+    if (x >= 0 && x < img->width && y >= 0 && y < img->height) // Check bounds
     {
-        mini_map->addr[y * mini_map->width + x] = color;
+        char *dst = (char *)img->addr + (y * img->size_line + x * (img->pixel_bits / 8));
+        *(unsigned int *)dst = color;
     }
 }
 
@@ -408,6 +618,10 @@ void draw_mini_map(t_game *game)
             // Calculate corresponding map coordinates
             map_x = (int)((game->player.x - game->mini_map.width / 2 / T_SIZE) + x / T_SIZE);
             map_y = (int)((game->player.y - game->mini_map.height / 2 / T_SIZE) + y / T_SIZE);
+
+            //printf("Map Coordinates: map_x = %d, map_y = %d, for pixel x = %d, y = %d\n", map_x, map_y, x, y);
+			//printf("Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
+
 
             // Check map boundaries and draw walls or empty spaces
             if (map_x >= 0 && map_x < game->map.width && map_y >= 0 && map_y < game->map.height)
@@ -521,15 +735,6 @@ void my_mlx_pixel_put(t_texture *img, int x, int y, int color)
         *(unsigned int *)dst = color;
     }
 }
-
-
-/*
-FAIRE UN DEUXIEME JEU A PART :
-- Prendre map parsé
-- Prendre position joueur
-- Quand portail passé on réaffiche tout (refaire fonction rendering)
-=> Réappeler la fonction qui affiche la map.
-*/
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -538,7 +743,7 @@ FAIRE UN DEUXIEME JEU A PART :
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/26 00:11:17 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/27 23:16:30 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -576,11 +781,6 @@ int	is_outside(t_game *game, double x, double y)
 	return (0);
 }
 
-// if pas de collision pour le nouveau x
-		// on attribue la nouvelle valeur a x
-	// If pas de collision pour le nouveau y
-		// on attribue la nouvelle valeur a y
-
 // void	update_position(t_game *game, double move_x, double move_y)
 // {
 // 	double	new_x;
@@ -604,23 +804,23 @@ int	is_outside(t_game *game, double x, double y)
 // 	printf("New position y : %f\n", game->player.y);
 // }
 
-void	update_position(t_game *game, double move_x, double move_y)
+
+void update_position(t_game *game, double move_x, double move_y)
 {
-    double	new_x;
-    double	new_y;
+    double new_x = game->player.x + move_x;
+    double new_y = game->player.y + move_y;
 
-    // Calcul des nouvelles coordonnées en fonction de la direction du joueur
-    new_x = game->player.x + move_x * game->player.speed;
-    new_y = game->player.y + move_y * game->player.speed;
-
-    // Vérification des collisions avant d'assigner les nouvelles coordonnées
-    if (!is_wall(game, new_x, game->player.y)) {
-        game->player.x = new_x; // Mise à jour de la position en X si pas de collision
+    // Check for wall collisions and update player position accordingly
+    if (!is_wall(game, new_x, game->player.y))
+    {
+        game->player.x = new_x;
+    }
+    if (!is_wall(game, game->player.x, new_y))
+    {
+        game->player.y = new_y;
     }
 
-    if (!is_wall(game, game->player.x, new_y)) {
-        game->player.y = new_y; // Mise à jour de la position en Y si pas de collision
-    }
+	printf("Updated Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
 }
 
 
@@ -650,34 +850,16 @@ void	update_position(t_game *game, double move_x, double move_y)
 
 void rotate_player(t_game *game, double angle)
 {
-    // Save old direction values
     double old_dir_x = game->player.dir_x;
     double old_plane_x = game->player.plane_x;
 
-    // Apply rotation using trigonometric functions
+    // Apply rotation using cosine and sine for smooth rotation
     game->player.dir_x = old_dir_x * cos(angle) - game->player.dir_y * sin(angle);
     game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
 
     game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
     game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
 }
-
-
-
-// void	rotate_player(t_game *game, int direction)
-// {
-//     double old_dir_x;
-//     double old_plane_x;
-//     double rotation_speed;
-
-//     old_dir_x = game->player.dir_x;
-//     old_plane_x = game->player.plane_x;
-//     rotation_speed = direction * game->player.rot_speed;
-//     game->player.dir_x = game->player.dir_x * cos(rotation_speed) - game->player.dir_y * sin(rotation_speed);
-//     game->player.dir_y = old_dir_x * sin(rotation_speed) + game->player.dir_y * cos(rotation_speed);
-//     game->player.plane_x = game->player.plane_x * cos(rotation_speed) - game->player.plane_y * sin(rotation_speed);
-//     game->player.plane_y = old_plane_x * sin(rotation_speed) + game->player.plane_y * cos(rotation_speed);
-// }
 
 // void    display_mini_map(t_game *game, t_texture *frame)
 // {
@@ -703,20 +885,30 @@ int display_each_frame(t_game *game)
     frame.img = mlx_new_image(game->mlx, frame.width, frame.height);
     frame.addr = (int *)mlx_get_data_addr(frame.img, &frame.pixel_bits, &frame.size_line, &frame.endian);
 
-    // Draw the minimap and player on the frame
-    draw_mini_map(game);
+    // Set frame as the active texture for drawing
+    game->mini_map = frame;
 
-    // Render the minimap to the window, with a larger size
-    mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10); // Position on the window
+    // Render the scene (walls, floor, ceiling)
+    render_scene(game, &frame);
+
+    // Render the minimap to the window
+    draw_mini_map(game);  // Update minimap content
+    mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10); // Minimap position on the window
+
+    // Display the rendered frame
+    mlx_put_image_to_window(game->mlx, game->win, frame.img, 0, 0); // Full scene on window
 
     // Clean up the frame resources
     mlx_destroy_image(game->mlx, frame.img);
 
     // Handle player movement and actions
     is_action(game);
+    display_portal_gun(game); // Handle gun display
 
     return 0;
 }
+
+
 
 
 /* ************************************************************************** */
@@ -774,6 +966,17 @@ int	free_all2(t_game *game)
 			i++;
 		}
 		free(game->map.map);
+	}
+	// for (i = 0; i < 4; i++)
+    // {
+    //     if (game->textures[i].img)
+    //         mlx_destroy_image(game->mlx, game->textures[i].img);
+    // }
+    // if (game->portal_gun.img)
+    //     mlx_destroy_image(game->mlx, game->portal_gun.img);
+    if (game->mini_map.img)
+	{
+        mlx_destroy_image(game->mlx, game->mini_map.img);
 	}
 	free_everything(game);
 	exit(EXIT_SUCCESS);

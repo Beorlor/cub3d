@@ -140,12 +140,3 @@ void my_mlx_pixel_put(t_texture *img, int x, int y, int color)
         *(unsigned int *)dst = color;
     }
 }
-
-
-/*
-FAIRE UN DEUXIEME JEU A PART :
-- Prendre map parsé
-- Prendre position joueur
-- Quand portail passé on réaffiche tout (refaire fonction rendering)
-=> Réappeler la fonction qui affiche la map.
-*/

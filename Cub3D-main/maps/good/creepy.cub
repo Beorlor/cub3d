@@ -1,7 +1,7 @@
-NO textures/simonkraft/respawn_anchor_side0.xpm
-EA textures/simonkraft/respawn_anchor_side2.xpm
-SO textures/simonkraft/respawn_anchor_side4.xpm
-WE textures/simonkraft/respawn_anchor_side3.xpm
+NO sprites/walls/brown_wall.xpm
+EA sprites/walls/grey_wall.xpm
+SO sprites/walls/white_wall.xpm
+WE sprites/walls/red_wall.xpm
 
 C 35,19,73
 F 15,6,40

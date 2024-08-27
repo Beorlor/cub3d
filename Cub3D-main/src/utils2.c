@@ -54,6 +54,17 @@ int	free_all2(t_game *game)
 		}
 		free(game->map.map);
 	}
+	// for (i = 0; i < 4; i++)
+    // {
+    //     if (game->textures[i].img)
+    //         mlx_destroy_image(game->mlx, game->textures[i].img);
+    // }
+    // if (game->portal_gun.img)
+    //     mlx_destroy_image(game->mlx, game->portal_gun.img);
+    if (game->mini_map.img)
+	{
+        mlx_destroy_image(game->mlx, game->mini_map.img);
+	}
 	free_everything(game);
 	exit(EXIT_SUCCESS);
 	return (0);

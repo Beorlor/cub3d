@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 09:36:20 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/29 16:50:30 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/27 12:05:48 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,6 @@ void	init_texture(t_texture *texture)
 	texture->height = 0;
 }
 
-// int	i;
-
-	// i = 0;
-	// while (i < 256)
-	// {
-	// 	input->keys[i] = 0;
-	// 	i++;
-	// }
 void	init_input(t_input *input)
 {
 	input->mouse_x = 0;

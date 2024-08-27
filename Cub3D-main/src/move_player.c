@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/26 00:51:06 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/27 23:26:04 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,6 @@ int	is_outside(t_game *game, double x, double y)
 		return (1);
 	return (0);
 }
-
-// if pas de collision pour le nouveau x
-		// on attribue la nouvelle valeur a x
-	// If pas de collision pour le nouveau y
-		// on attribue la nouvelle valeur a y
 
 // void	update_position(t_game *game, double move_x, double move_y)
 // {
@@ -129,24 +124,6 @@ void rotate_player(t_game *game, double angle)
     game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
 }
 
-
-
-
-// void	rotate_player(t_game *game, int direction)
-// {
-//     double old_dir_x;
-//     double old_plane_x;
-//     double rotation_speed;
-
-//     old_dir_x = game->player.dir_x;
-//     old_plane_x = game->player.plane_x;
-//     rotation_speed = direction * game->player.rot_speed;
-//     game->player.dir_x = game->player.dir_x * cos(rotation_speed) - game->player.dir_y * sin(rotation_speed);
-//     game->player.dir_y = old_dir_x * sin(rotation_speed) + game->player.dir_y * cos(rotation_speed);
-//     game->player.plane_x = game->player.plane_x * cos(rotation_speed) - game->player.plane_y * sin(rotation_speed);
-//     game->player.plane_y = old_plane_x * sin(rotation_speed) + game->player.plane_y * cos(rotation_speed);
-// }
-
 // void    display_mini_map(t_game *game, t_texture *frame)
 // {
 //     t_texture mini_map;
@@ -171,19 +148,27 @@ int display_each_frame(t_game *game)
     frame.img = mlx_new_image(game->mlx, frame.width, frame.height);
     frame.addr = (int *)mlx_get_data_addr(frame.img, &frame.pixel_bits, &frame.size_line, &frame.endian);
 
-    // Draw the minimap and player on the frame
-    draw_mini_map(game);
+    // Render the scene (walls, floor, ceiling) on the frame
+    render_scene(game, &frame);
 
-    // Render the minimap to the window, with a larger size
-    mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10); // Position on the window
+    // Display the rendered frame (this shows the scene)
+    mlx_put_image_to_window(game->mlx, game->win, frame.img, 0, 0);
+
+    // Draw the minimap on top of the scene
+    draw_mini_map(game);
+    mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10);  // Minimap overlay
 
     // Clean up the frame resources
     mlx_destroy_image(game->mlx, frame.img);
 
     // Handle player movement and actions
     is_action(game);
+    display_portal_gun(game);  // Handle gun display
 
     return 0;
 }
+
+
+
 
 

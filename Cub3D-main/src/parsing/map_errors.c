@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_errors.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:00 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:19 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/27 12:36:47 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_y = -1;
 		game->player.plane_x = 0.66;
 		game->player.plane_y = 0;
+		game->orientation = 1;
 	}
 	else if (game->map.map[i][j] == 'E')
 	{
@@ -59,6 +60,7 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_y = 0;
 		game->player.plane_x = 0;
 		game->player.plane_y = 0.66;
+		game->orientation = 2;
 	}
 	else if (game->map.map[i][j] == 'W')
 	{
@@ -66,6 +68,7 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_y = 0;
 		game->player.plane_x = 0;
 		game->player.plane_y = -0.66;
+		game->orientation = 3;
 	}
 	else if (game->map.map[i][j] == 'S')
 	{
@@ -73,15 +76,10 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_y = 1;
 		game->player.plane_x = -0.66;
 		game->player.plane_y = 0;
+		game->orientation = 4;
 	}
-	// printf("Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
-	// printf("Player Direction: dir_x = %f, dir_y = %f\n", game->player.dir_x, game->player.dir_y);
-	// printf("Player Plane: plane_x = %f, plane_y = %f\n", game->player.plane_x, game->player.plane_y);
 }
 
-// printf("Map : %c\n", game->map.map[i][j]);
-// printf("Map : %s\n", game->map.map[i]);
-// game->player.dir_y = 1; // TO DO : protection pour le retournement !!
 int	is_player_valid(t_game *game)
 {
 	size_t	i;

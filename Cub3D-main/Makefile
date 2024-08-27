@@ -6,7 +6,7 @@
 #    By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 18:59:35 by jeza              #+#    #+#              #
-#    Updated: 2024/08/25 20:44:32 by jedurand         ###   ########.fr        #
+#    Updated: 2024/08/27 22:32:17 by jedurand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,12 +20,12 @@ CC := gcc
 CFLAGS := -Wall -Wextra -Werror -Iheaders/ -Iminilibx -g
 
 #Liste des fichiers source.
-SRCS = src/main.c src/events.c src/init.c src/utils.c \
+SRCS = src/main.c src/events.c src/init.c src/utils.c src/graphic.c \
        src/utils2.c src/init2.c src/move_player.c src/mini_map.c \
        src/parsing/eof_error.c src/parsing/fill_map.c src/parsing/map_errors.c \
        src/parsing/map_walls.c src/parsing/parser.c src/parsing/parser_description_file.c \
        src/parsing/valid_file.c src/parsing/file_errors.c src/parsing/file_utils.c \
-	   src/parsing/map_utils.c
+	   src/parsing/map_utils.c src/sprites/portal_gun.c src/sprites/wall_textures.c
 
 
 LIBFT = Libft/libft.a

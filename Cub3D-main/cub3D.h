@@ -105,6 +105,16 @@ typedef struct s_texture
 	int		height;
 }	t_texture;
 
+typedef struct s_ball
+{
+	double		x;
+	double		y;
+	double		direction_x;
+	double		direction_y;
+	int			active;
+	t_texture	texture;
+}	t_ball;
+
 typedef struct s_color
 {
 	int	r;
@@ -144,9 +154,16 @@ typedef struct s_game
 	t_color		ceiling;
 	t_input		input;
 	t_texture	mini_map;
+	t_texture	portal_gun;
+	t_ball		ball[2];
+	int			orientation;
+	int			gun_shot;
+	int			shot_frame;
 	char		*texture_paths[4];
 	int			running;
 	int			touch_state[6];
+	int         walk_offset;   // Variable to simulate the walk effect
+	int         frame_count;   // Frame counter to animate walk effect
 }	t_game;
 
 // UTILS
@@ -170,12 +187,14 @@ void	init_texture(t_texture *texture);
 void	init_color(t_color *color);
 void	init_input(t_input *input);
 void	create_window(t_game *game);
-void	create_images(t_game *game);
+void	create_textures(t_game *game);
 void	read_map(t_game *game, const char *file);
 void	malloc_map(t_game *game);
 void	fill_map(t_game *game, const char *file);
-
+void	init_textures(t_game *game);
 void	manage_errors(t_game *game, const char *file);
+void	init_ball(t_game	*game);
+
 // MAP ERRORS
 int		is_map_valid(t_game *game);
 int		is_map_empty(t_game *game);
@@ -224,6 +243,7 @@ int		game_loop(t_game *game);
 int		handle_input(t_game *game);
 int		manage_keyrelease(int keycode, t_game *game);
 int		manage_keypress(int keycode, t_game *game);
+int		manage_mouse_click(int button, int x, int y, t_game *game);
 void	is_action(t_game *game);
 
 // PLAYER POSITION
@@ -232,7 +252,7 @@ int		is_outside(t_game *game, double x, double y);
 void	check_map_path(double x, double y, t_game *game);
 void	rotate_player(t_game *game, double angle);
 // void	rotate_player(t_game *game, int direction);
-int	manage_mouse_movement(int x, t_game *game);
+int		manage_mouse_movement(int x, int y, t_game *game);
 
 // DISPLAY
 int	display_each_frame(t_game *game);
@@ -242,9 +262,20 @@ void	render_mini_map(t_game *game, t_texture *frame);
 void    draw_mini_map(t_game *game);
 void    draw(t_texture *img, int x, int y, int color);
 void    draw_player(t_game *game, t_texture *mini_map);
-int is_wall(t_game *game, double map_x, double map_y);
+int		is_wall(t_game *game, double map_x, double map_y);
 void    draw_view_direction(t_game *game, t_texture *mini_map);
-void my_mlx_pixel_put(t_texture *img, int x, int y, int color);
+void	my_mlx_pixel_put(t_texture *img, int x, int y, int color);
 
+// SPRITES
+void    load_portal_gun(t_game *game);
+void	display_portal_gun(t_game *game);
+void 	create_ball(t_game *game, int button);
+void 	update_balls(t_game *game);
+void	move_ball_towards_center(t_game *game, t_ball *ball);
+void	load_ball_textures(t_game *game);
+void 	draw_ball(t_game *game);
+
+// RENDERING FUNCTIONS
+void render_scene(t_game *game, t_texture *frame);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_description_file.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:39:43 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:24 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:54:54 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void	invalid_rgb(char *line, t_game *game)
 	free_all2(game);
 }
 
-// TEST INITIALIZATION OF RGB COLORS !
 int	is_rgb_code(t_game *game, char *line)
 {
 	int		r;
@@ -131,7 +130,6 @@ int	is_path_textures(t_game *game, char *line)
 
 int	check_textures_and_rgb(t_game *game, char *line, int *textures, int *rgb)
 {
-	printf("Textures  : %d\n", *textures);
 	if (is_path_textures(game, line) == 0)
 	{
 		*textures += 1;

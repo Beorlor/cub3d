@@ -40,8 +40,8 @@ int	is_file_valid(const char *file, t_game *game)
 		return (1);
 	if (is_file_empty(file, game) == 1)
 		return (1);
-	if (are_file_textures_valid(game) == 1)
-		return (1);
+	// if (are_file_textures_valid(game) == 1)
+	// 	return (1);
 	if (are_rgb_ids_valid(game, file) == 1)
 		return (1);
 	if (is_there_something_after_map(file, game) == 1)

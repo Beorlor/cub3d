@@ -19,10 +19,6 @@ la vérification
 14. Initialiser le dir_x > avec condition si NO on met 0. + dir_y à 1 (devant) => DONE TO TEST
 
 
-ASK JB : 
-- Init position du joueur : x & y ok mais le rest IDK ???
-
-
 TASK : Chargement des textures et des couleurs : 
 
  -   Charger les textures pour les murs (Nord, Sud, Est, Ouest) à partir des chemins spécifiés dans le fichier de configuration.
