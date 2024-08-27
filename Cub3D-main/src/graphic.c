@@ -4,15 +4,18 @@ void render_scene(t_game *game, t_texture *frame) {
     int ceiling_color = (game->ceiling.r << 16) | (game->ceiling.g << 8) | game->ceiling.b;
     int floor_color = (game->floor.r << 16) | (game->floor.g << 8) | game->floor.b;
 
-    // Draw the ceiling
-    for (int y = 0; y < game->win_height / 2; y++) {
+    // Apply the walking offset to the rendering
+    int walk_offset = game->walk_offset;
+
+    // Draw the ceiling with walking offset
+    for (int y = 0; y < game->win_height / 2 + walk_offset; y++) {
         for (int x = 0; x < game->win_width; x++) {
             my_mlx_pixel_put(frame, x, y, ceiling_color);
         }
     }
 
-    // Draw the floor
-    for (int y = game->win_height / 2; y < game->win_height; y++) {
+    // Draw the floor with walking offset
+    for (int y = game->win_height / 2 + walk_offset; y < game->win_height; y++) {
         for (int x = 0; x < game->win_width; x++) {
             my_mlx_pixel_put(frame, x, y, floor_color);
         }
@@ -81,10 +84,10 @@ void render_scene(t_game *game, t_texture *frame) {
         // Calculate height of line to draw on screen
         int line_height = (int)(game->win_height / perp_wall_dist);
 
-        // Calculate lowest and highest pixel to fill in current stripe
-        int draw_start = -line_height / 2 + game->win_height / 2 + game->walk_offset;
+        // Calculate lowest and highest pixel to fill in current stripe, adjusted with walk offset
+        int draw_start = -line_height / 2 + game->win_height / 2 + walk_offset;
         if (draw_start < 0) draw_start = 0;
-        int draw_end = line_height / 2 + game->win_height / 2 + game->walk_offset;
+        int draw_end = line_height / 2 + game->win_height / 2 + walk_offset;
         if (draw_end >= game->win_height) draw_end = game->win_height - 1;
 
         // Choose wall color based on the side the wall is facing
