@@ -24,7 +24,7 @@ void render_scene(t_game *game, t_texture *frame) {
     // Raycasting to draw the walls
     for (int x = 0; x < game->win_width; x++) {
         // Calculate ray position and direction
-        double camera_x = (2 * x / (double)game->win_width - 1) / 3;
+        double camera_x = (2 * x / (double)game->win_width - 1) / 2;
         double ray_dir_x = game->player.dir_x + game->player.plane_x * camera_x;
         double ray_dir_y = game->player.dir_y + game->player.plane_y * camera_x;
 		//printf("%f %f %f %f %f\n", game->player.plane_x, game->player.plane_y, camera_x, ray_dir_x, ray_dir_y);
