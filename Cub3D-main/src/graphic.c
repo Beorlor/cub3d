@@ -27,6 +27,7 @@ void render_scene(t_game *game, t_texture *frame) {
         double camera_x = 2 * x / (double)game->win_width - 1;
         double ray_dir_x = game->player.dir_x + game->player.plane_x * camera_x;
         double ray_dir_y = game->player.dir_y + game->player.plane_y * camera_x;
+		//printf("%f %f %f %f %f\n", game->player.plane_x, game->player.plane_y, camera_x, ray_dir_x, ray_dir_y);
 
         // Map position
         int map_x = (int)game->player.x;
