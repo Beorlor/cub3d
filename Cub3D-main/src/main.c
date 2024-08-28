@@ -82,7 +82,7 @@ int	main(int argc, char *argv[])
 	malloc_map(&game);
 	fill_map(&game, map);
 	manage_errors(&game, map);
-	// create_textures(&game);
+	create_textures(&game);
 	create_window(&game);
 	mlx_loop(game.mlx);
 	free(map);
