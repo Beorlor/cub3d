@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:00 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/28 01:54:44 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/28 14:54:57 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	set_up_player_position(t_game *game, int i, int j)
 	{
 		game->player.dir_x = 0;
 		game->player.dir_y = -1;
-		game->player.plane_x = 0.66;
+		game->player.plane_x = 1;
 		game->player.plane_y = 0;
 		game->orientation = 1;
 	}
@@ -59,7 +59,7 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_x = 1;
 		game->player.dir_y = 0;
 		game->player.plane_x = 0;
-		game->player.plane_y = 0.66;
+		game->player.plane_y = 1;
 		game->orientation = 2;
 	}
 	else if (game->map.map[i][j] == 'W')
@@ -67,14 +67,14 @@ void	set_up_player_position(t_game *game, int i, int j)
 		game->player.dir_x = -1;
 		game->player.dir_y = 0;
 		game->player.plane_x = 0;
-		game->player.plane_y = -0.66;
+		game->player.plane_y = -1;
 		game->orientation = 3;
 	}
 	else if (game->map.map[i][j] == 'S')
 	{
 		game->player.dir_x = 0;
 		game->player.dir_y = 1;
-		game->player.plane_x = -0.66;
+		game->player.plane_x = -1;
 		game->player.plane_y = 0;
 		game->orientation = 4;
 	}
