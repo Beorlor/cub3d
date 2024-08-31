@@ -1,77 +1,15 @@
-1. Erreur gestion char dans la map => DONE
-2. Tester la fonction de check des murs (foodfill) => DONE
-3. Vérifier les doublons (CHECK TEXTURES && RGB EN DOUBLE) => DONE
-4. Check les paths des textures (access) => DONE
-4. Pas plusieurs maps => DONE
-5. Si map au début du file => DONE
-6. Definir la map sur le file => DONE
-> Check pseudo code on discord pour renforcer
-la vérification
-    => Renforcer check pour déterminer la map !
-7. Pas quelque chose après la map dans le file : DONE
-=> Check si ligne vide > wall start > wall end > vide
-8. Mettre au propre + norm ! => DONE
-9. Check if the nb of textures & rgb are not good => DONE
-10. Init everything in the init function() => DONE
-11. Virgule entre codes rgb + Space entre position et path => DONE
-12. Create mlx image ! => DONE
-13. ENUM pour path textures + retirer NO au debut de la ligne du file => DONE
-14. Initialiser le dir_x > avec condition si NO on met 0. + dir_y à 1 (devant) => DONE TO TEST
+Dans les trucs a faire :
+
+Xpm porte
+Porte
+Noir autour du sprite
+
+Math lier a animation boule
+Remettre les rotations touches
 
 
-TASK : Chargement des textures et des couleurs : 
-
- -   Charger les textures pour les murs (Nord, Sud, Est, Ouest) à partir des chemins spécifiés dans le fichier de configuration.
- -   Configurer les couleurs du plafond et du sol à partir des valeurs RGB spécifiées.
- -   Gérer les erreurs de chargement.
+Norme
 
 
-5. Bonne value par rapport a chaque key value (key value = NO for ex.)
-
-------------- TO DO LATER -------------
-Check textures !
-Murs (4)
-Vidéo : cub3d portal => Check same textures !
-Pas le sol ni plafond.
-
-SOURIS :
-Direction du joueur : mettre de base les valeurs 
-Doit etre un float qui va de 0 a 3,99
-0 => NORTH
-1 => WEST
-2 => Sud
-3 => EAST
-
-Si bouge la souris vers la gauche => Tend vers 1 donc pour l'Ouest
-Et si il tend vers 3,99 => repart à 0
-
-DEFAUT : 
-pour tester il faut aller loin dans l'init de la mini
-il faudra une fenêtre qui garde le curseur au milieu pour tester 
-haut, bas, gauche, droite.
-
------- TO DO ------ 
-- Erreur fonction : is there something after map => DONE
-- Gérer erreur pas de ligne entre les éléments du file (check sujet) => DONE
-- Fonctions de déplacement => DONE
-- Fonction de rotation => DONE
-- Gestion mouvements souris => DONE
-- Modifier code keys => DONE
-- Finir norme => DONE 
-- Test map filling to be sure ! => DONE
-- MLX auto repeat => DONE
-- Modify int (in map tab) TO double => TO SEE IF NECESSARY
-- Tests errors => DONE
-- No error message when something after map ! (no every test)
-+ multiple maps => DONE
-- Textures duplicate is not working ! => DONE
-- Think to xpm error => DONE
-- Faire fiche de compréhension pour déplacements : 
-    > Comprendre les paramètres envoyés pour se déplacer => OK
-    > Pourquoi on utilise player.dir et pas player.x ?
-    > A quoi sert player.speed et pourquoi on fait pas style y-- ou x++
-    comme sur so_long pour avancer et reculer ?
-    > Comment faire pour rotate ? => OK
-    > Gestion des mouvements de la souris => OK
-    > MASK mlx + codes
-    > Différentes fonctions de la mlx.
+Xpm portail
+Portail
