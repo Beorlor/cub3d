@@ -21,13 +21,12 @@ void render_scene(t_game *game, t_texture *frame) {
         }
     }
 
-    // Raycasting to draw the walls
+    // Raycasting to draw the walls and doors
     for (int x = 0; x < game->win_width; x++) {
         // Calculate ray position and direction
         double camera_x = (2 * x / (double)game->win_width - 1) / 2;
         double ray_dir_x = game->player.dir_x + game->player.plane_x * camera_x;
         double ray_dir_y = game->player.dir_y + game->player.plane_y * camera_x;
-		//printf("%f %f %f %f %f\n", game->player.plane_x, game->player.plane_y, camera_x, ray_dir_x, ray_dir_y);
 
         // Map position
         int map_x = (int)game->player.x;
@@ -58,8 +57,10 @@ void render_scene(t_game *game, t_texture *frame) {
         }
 
         // Perform DDA (Digital Differential Analysis)
-        int hit = 0;  // Was there a wall hit?
+        int hit = 0;  // Was there a wall or door hit?
         int side;     // Was a NS or a EW wall hit?
+        int door = 0; // Was a door hit?
+
         while (hit == 0) {
             // Jump to next map square, either in x-direction, or in y-direction
             if (side_dist_x < side_dist_y) {
@@ -71,8 +72,17 @@ void render_scene(t_game *game, t_texture *frame) {
                 map_y += step_y;
                 side = 1;
             }
-            // Check if ray has hit a wall
-            if (game->map.map[map_y][map_x] == '1') hit = 1;
+
+            // Check if ray has hit a wall or door
+            if (game->map.map[map_y][map_x] == '1') {
+                hit = 1;  // Wall hit
+            } else if (game->map.map[map_y][map_x] == 'D') {
+                // Check if the player is close to the door
+                if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0) {
+                    hit = 1;  // Treat door as wall
+                    door = 1; // Mark as door
+                }
+            }
         }
 
         // Calculate distance projected on camera direction (perpendicular distance)
@@ -93,45 +103,52 @@ void render_scene(t_game *game, t_texture *frame) {
 
         // Determine texture index based on wall hit direction
         int texture_index;
-        if (side == 0) {
-            texture_index = (step_x > 0) ? EAST : WEST;
+        if (door) {
+            // Use a special color for doors (white)
+            for (int y = draw_start; y < draw_end; y++) {
+                my_mlx_pixel_put(frame, x, y, 0xFFFFFF); // White color for door
+            }
         } else {
-            texture_index = (step_y > 0) ? SOUTH : NORTH;
-        }
+            if (side == 0) {
+                texture_index = (step_x > 0) ? EAST : WEST;
+            } else {
+                texture_index = (step_y > 0) ? SOUTH : NORTH;
+            }
 
-        // Calculate the exact position where the wall was hit
-        double wall_x;
-        if (side == 0)
-            wall_x = game->player.y + perp_wall_dist * ray_dir_y;
-        else
-            wall_x = game->player.x + perp_wall_dist * ray_dir_x;
-        wall_x -= floor(wall_x);
+            // Calculate the exact position where the wall was hit
+            double wall_x;
+            if (side == 0)
+                wall_x = game->player.y + perp_wall_dist * ray_dir_y;
+            else
+                wall_x = game->player.x + perp_wall_dist * ray_dir_x;
+            wall_x -= floor(wall_x);
 
-        // X coordinate on the texture
-        int tex_x = (int)(wall_x * (double)game->textures[texture_index].width);
-        if (tex_x < 0) tex_x = 0;
-        if (tex_x >= game->textures[texture_index].width) tex_x = game->textures[texture_index].width - 1;
+            // X coordinate on the texture
+            int tex_x = (int)(wall_x * (double)game->textures[texture_index].width);
+            if (tex_x < 0) tex_x = 0;
+            if (tex_x >= game->textures[texture_index].width) tex_x = game->textures[texture_index].width - 1;
 
-        // Fix the texture direction issue
-        if (side == 0 && step_x < 0) tex_x = game->textures[texture_index].width - tex_x - 1;
-        if (side == 1 && step_y > 0) tex_x = game->textures[texture_index].width - tex_x - 1;
+            // Fix the texture direction issue
+            if (side == 0 && step_x < 0) tex_x = game->textures[texture_index].width - tex_x - 1;
+            if (side == 1 && step_y > 0) tex_x = game->textures[texture_index].width - tex_x - 1;
 
-        // Draw the wall with texture
-        for (int y = draw_start; y < draw_end; y++) {
-            // Calculate the y-coordinate on the texture, considering walk offset
-            int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * game->textures[texture_index].height) / line_height / 256;
+            // Draw the wall with texture
+            for (int y = draw_start; y < draw_end; y++) {
+                // Calculate the y-coordinate on the texture, considering walk offset
+                int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * game->textures[texture_index].height) / line_height / 256;
 
-            if (tex_y < 0) tex_y = 0;
-            if (tex_y >= game->textures[texture_index].height) tex_y = game->textures[texture_index].height - 1;
+                if (tex_y < 0) tex_y = 0;
+                if (tex_y >= game->textures[texture_index].height) tex_y = game->textures[texture_index].height - 1;
 
-            // Get the color from the texture
-            int color = game->textures[texture_index].addr[tex_y * game->textures[texture_index].width + tex_x];
+                // Get the color from the texture
+                int color = game->textures[texture_index].addr[tex_y * game->textures[texture_index].width + tex_x];
 
-            // Darken the color if it's a side wall (for a shading effect)
-            if (side == 1) color = (color >> 1) & 0x7F7F7F;
+                // Darken the color if it's a side wall (for a shading effect)
+                if (side == 1) color = (color >> 1) & 0x7F7F7F;
 
-            // Draw the pixel
-            my_mlx_pixel_put(frame, x, y, color);
+                // Draw the pixel
+                my_mlx_pixel_put(frame, x, y, color);
+            }
         }
     }
 }
