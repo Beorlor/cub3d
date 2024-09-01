@@ -1,7 +1,5 @@
 Dans les trucs a faire :
 
-Xpm porte
-Porte
 Noir autour du sprite
 
 Math lier a animation boule
