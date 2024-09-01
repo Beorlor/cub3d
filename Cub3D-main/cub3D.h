@@ -109,8 +109,13 @@ typedef struct s_ball
 {
 	double		x;
 	double		y;
+	double		wx;
+	double		wy;
 	double		direction_x;
 	double		direction_y;
+	double		speed;
+	int			stage;
+	int			size;
 	int			active;
 	t_texture	texture;
 }	t_ball;
@@ -282,7 +287,7 @@ int		display_each_frame(t_game *game);
 void    load_portal_gun(t_game *game);
 void	display_portal_gun(t_game *game);
 void 	create_ball(t_game *game, int button);
-t_ball	*set_up_ball(t_ball *ball, t_game *game, int button);
+t_ball	*set_up_ball(t_game *game, int button);
 void 	update_balls(t_game *game);
 void	move_ball_towards_center(t_game *game, t_ball *ball);
 void	load_ball_textures(t_game *game);
