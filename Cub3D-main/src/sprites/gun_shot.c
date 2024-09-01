@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 06:05:47 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 01:58:02 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,18 +128,14 @@ void	move_ball_towards_wall(t_game *game, t_ball *ball)
 	ball->x = next_x;
 	ball->y = next_y;
 
-	// Update the window coordinates
+	// Update the window coordinates and adjust for shrinking size
 	ball->wx = game->win_width / 2.0 + (next_x - game->player.x) * T_SIZE - (ball->size / 2.0);
 	ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
 
 	// Shrink the ball as it moves
 	ball->size = fmax(5, ball->size - 1);
 
-	if (ball->size <= 5)
-	{
-		printf("Ball disappeared at size: %d\n", ball->size);
-		ball->active = 0;
-	}
+	// Continue moving even if the ball is small, until it hits a wall
 }
 
 // Update the state of the balls
@@ -192,8 +188,8 @@ void	load_ball_textures(t_game *game)
 			&game->ball[1].texture.size_line, &game->ball[1].texture.endian);
 }
 
-// Draw the ball on the screen
-void	draw_ball(t_game *game)
+// Draw the ball on the screen using my_mlx_pixel_put on the frame buffer
+void	draw_ball(t_game *game, t_texture *frame)
 {
 	int	i;
 
@@ -202,9 +198,28 @@ void	draw_ball(t_game *game)
 	{
 		if (game->ball[i].active)
 		{
-			mlx_put_image_to_window(game->mlx, game->win,
-				game->ball[i].texture.img, game->ball[i].wx,
-				game->ball[i].wy);
+			int tex_width = game->ball[i].texture.width;
+			int tex_height = game->ball[i].texture.height;
+
+			// Loop through each pixel of the texture
+			for (int y = 0; y < tex_height; y++)
+			{
+				for (int x = 0; x < tex_width; x++)
+				{
+					// Get the color from the texture
+					int color = game->ball[i].texture.addr[y * tex_width + x];
+
+					// Calculate the position to draw the pixel on the screen
+					int screen_x = game->ball[i].wx + x;
+					int screen_y = game->ball[i].wy + y;
+
+					// Draw the pixel if it's within the window bounds
+					if (screen_x >= 0 && screen_x < game->win_width && screen_y >= 0 && screen_y < game->win_height)
+					{
+						my_mlx_pixel_put(frame, screen_x, screen_y, color);
+					}
+				}
+			}
 		}
 		i++;
 	}

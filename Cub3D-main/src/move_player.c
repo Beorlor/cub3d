@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 04:31:13 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 01:57:52 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,6 +184,8 @@ int display_each_frame(t_game *game)
 	frame.addr = (int *)mlx_get_data_addr(frame.img, &frame.pixel_bits, &frame.size_line, &frame.endian);
 	// Render the scene (walls, floor, ceiling) on the frame
 	render_scene(game, &frame);
+	update_balls(game);
+	draw_ball(game, &frame);
 	// Display the rendered frame (this shows the scene)
 	mlx_put_image_to_window(game->mlx, game->win, frame.img, 0, 0);
 	// Draw the minimap on top of the scene
@@ -196,8 +198,6 @@ int display_each_frame(t_game *game)
 	// Handle player movement and actions
 	is_action(game);
 	display_portal_gun(game);  // Handle gun display
-	update_balls(game);
-	draw_ball(game);
 	return 0;
 }
 

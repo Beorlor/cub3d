@@ -291,7 +291,7 @@ t_ball	*set_up_ball(t_game *game, int button);
 void 	update_balls(t_game *game);
 void	move_ball_towards_center(t_game *game, t_ball *ball);
 void	load_ball_textures(t_game *game);
-void 	draw_ball(t_game *game);
+void	draw_ball(t_game *game, t_texture *frame);
 void	overlay_img(t_texture fg, t_texture bg, t_game *game, int pos_x, int pos_y);
 
 // RENDERING FUNCTIONS
