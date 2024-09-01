@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 05:55:06 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/01 06:05:47 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,11 @@ void	create_ball(t_game *game, int button)
 
 		ball->size = ball->texture.width;
 		ball->stage = 1; // Start at stage 1
-		ball->speed = 0.5; // Set the speed for the ball (slow)
+		ball->speed = 0.05; // Slow speed for map movement
 
 		// Set the direction based on the player's direction
-		ball->direction_x = game->player.dir_x * ball->speed;
-		ball->direction_y = game->player.dir_y * ball->speed;
+		ball->direction_x = game->player.dir_x;
+		ball->direction_y = game->player.dir_y;
 
 		ball->active = 1;
 	}
@@ -86,10 +86,13 @@ void	move_ball_towards_center(t_game *game, t_ball *ball)
 	dy = center_y - (ball->wy + ball->size / 2.0);
 	distance = sqrt(dx * dx + dy * dy);
 
+	// Shrink the ball slightly as it moves towards the center
+	ball->size = fmax(5, ball->size - 1);
+
 	if (distance > 5.0)
 	{
-		ball->wx += (dx / distance) * ball->speed;
-		ball->wy += (dy / distance) * ball->speed;
+		ball->wx += (dx / distance) * 15;  // Faster movement to the center
+		ball->wy += (dy / distance) * 15;
 	}
 	else
 	{
@@ -99,23 +102,21 @@ void	move_ball_towards_center(t_game *game, t_ball *ball)
 	}
 }
 
-// Move the ball towards the wall and shrink it (second stage of the animation)
+// Move the ball slowly across the map towards the wall (second stage of the animation)
 void	move_ball_towards_wall(t_game *game, t_ball *ball)
 {
+	double	next_x;
+	double	next_y;
 	int		map_x;
 	int		map_y;
 
-	// Update the ball's position in the game world
-	ball->x += ball->direction_x;
-	ball->y += ball->direction_y;
-
-	// Convert the real position to screen coordinates
-	ball->wx += ball->direction_x * T_SIZE;
-	ball->wy += ball->direction_y * T_SIZE;
+	// Calculate next position on the map
+	next_x = ball->x + ball->direction_x * ball->speed;
+	next_y = ball->y + ball->direction_y * ball->speed;
 
 	// Check if the ball hits a wall
-	map_x = (int)(ball->x);
-	map_y = (int)(ball->y);
+	map_x = (int)next_x;
+	map_y = (int)next_y;
 	if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1')
 	{
 		printf("Ball disappeared at size: %d\n", ball->size);
@@ -123,7 +124,15 @@ void	move_ball_towards_wall(t_game *game, t_ball *ball)
 		return;
 	}
 
-	// Shrink the ball as it moves towards the wall
+	// Update ball position on the map
+	ball->x = next_x;
+	ball->y = next_y;
+
+	// Update the window coordinates
+	ball->wx = game->win_width / 2.0 + (next_x - game->player.x) * T_SIZE - (ball->size / 2.0);
+	ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
+
+	// Shrink the ball as it moves
 	ball->size = fmax(5, ball->size - 1);
 
 	if (ball->size <= 5)
@@ -194,8 +203,8 @@ void	draw_ball(t_game *game)
 		if (game->ball[i].active)
 		{
 			mlx_put_image_to_window(game->mlx, game->win,
-				game->ball[i].texture.img, game->ball[i].wx - (game->ball[i].size / 2.0),
-				game->ball[i].wy - (game->ball[i].size / 2.0));
+				game->ball[i].texture.img, game->ball[i].wx,
+				game->ball[i].wy);
 		}
 		i++;
 	}
