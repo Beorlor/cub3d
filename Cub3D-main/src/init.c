@@ -47,6 +47,7 @@ void	init_game(t_game *game)
 	load_portal_gun(game);
 	game->frame_count = 0;
 	game->walk_offset = 0;
+	game->skip_mouse_event = 0;
 }
 
 void	init_map(t_map *map)

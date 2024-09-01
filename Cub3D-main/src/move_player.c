@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 03:54:18 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/01 04:31:13 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ void update_position(t_game *game, double move_x, double move_y)
 
 void rotate_player(t_game *game, double angle)
 {
+	game->skip_mouse_event = 1;
     double old_dir_x = game->player.dir_x;
     double old_plane_x = game->player.plane_x;
 
@@ -122,7 +123,10 @@ void rotate_player(t_game *game, double angle)
 
     game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
     game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
-	// mlx_mouse_move(game->mlx, game->win, game->win_width / 2, game->win_height / 2);
+
+	//TODO fix
+	//mlx_mouse_move(game->mlx, game->win, game->win_width / 2, game->win_height / 2);
+	game->skip_mouse_event = 0;
 }
 
 // void    display_mini_map(t_game *game, t_texture *frame)

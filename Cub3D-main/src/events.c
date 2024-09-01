@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 03:43:00 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/01 04:28:56 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,11 @@ int	manage_mouse_movement(int x, int y, t_game *game)
 {
 	double	angle;
 	int		dx;
+
+	// Skip the event if it's triggered by the programmatic mouse move
+    if (game->skip_mouse_event) {
+        return (0);
+    }
 
 	(void)y;
 	if (x == game->input.last_mouse_x)

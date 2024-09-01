@@ -164,6 +164,7 @@ typedef struct s_game
 	int			touch_state[6];
 	int         walk_offset;   // Variable to simulate the walk effect
 	int         frame_count;   // Frame counter to animate walk effect
+	int skip_mouse_event;
 }	t_game;
 
 // UTILS
