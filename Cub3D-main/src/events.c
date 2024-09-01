@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/27 23:07:20 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/01 03:43:00 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,18 +174,18 @@ int	manage_mouse_movement(int x, int y, t_game *game)
 	return (0);
 }
 
-int manage_mouse_click(int button, int x, int y, t_game *game)
+int	manage_mouse_click(int button, int x, int y, t_game *game)
 {
-    (void)x;
-    (void)y;
-    if (button == 1 || button == 3) // Clic gauche ou droit
-    {
-        if (game->gun_shot == 0) // Si pas de tir en cours
-        {
-            game->gun_shot = 1;
-            game->shot_frame = 0;
-            // create_ball(game, button);
-        }
-    }
-    return (0);
+	(void)x;
+	(void)y;
+	if (button == 1 || button == 3) // Clic gauche ou droit
+	{
+		if (game->gun_shot == 0) // Si pas de tir en cours
+		{
+			game->gun_shot = 1;
+			game->shot_frame = 0;
+		}
+		create_ball(game, button);
+	}
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:00 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/28 15:17:06 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/01 03:58:26 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,37 +47,13 @@ void	set_up_player_position(t_game *game, int i, int j)
 	game->player.x = j + 0.5;
 	game->player.y = i + 0.5;
 	if (game->map.map[i][j] == 'N')
-	{
-		game->player.dir_x = 0;
-		game->player.dir_y = -1;
-		game->player.plane_x = 1;
-		game->player.plane_y = 0;
-		game->orientation = 1;
-	}
+		set_up_north(game);
 	else if (game->map.map[i][j] == 'E')
-	{
-		game->player.dir_x = 1;
-		game->player.dir_y = 0;
-		game->player.plane_x = 0;
-		game->player.plane_y = 1;
-		game->orientation = 2;
-	}
+		set_up_east(game);
 	else if (game->map.map[i][j] == 'W')
-	{
-		game->player.dir_x = -1;
-		game->player.dir_y = 0;
-		game->player.plane_x = 0;
-		game->player.plane_y = -1;
-		game->orientation = 3;
-	}
+		set_up_west(game);
 	else if (game->map.map[i][j] == 'S')
-	{
-		game->player.dir_x = 0;
-		game->player.dir_y = 1;
-		game->player.plane_x = -1;
-		game->player.plane_y = 0;
-		game->orientation = 4;
-	}
+		set_up_south(game);
 }
 
 int	is_player_valid(t_game *game)
@@ -122,8 +98,8 @@ int	is_char_valid(t_game *game)
 			if (game->map.map[i][j] != '1' && game->map.map[i][j] != '0'
 				&& game->map.map[i][j] != 'S' && game->map.map[i][j] != 'N'
 				&& game->map.map[i][j] != 'W' && game->map.map[i][j] != 'E'
-				&& game->map.map[i][j] != 32 && game->map.map[i][j] != '\0'
-				&& game->map.map[i][j] != '\n')
+				&& game->map.map[i][j] != 32 && game->map.map[i][j] != 'D'
+				&& game->map.map[i][j] != '\0' && game->map.map[i][j] != '\n')
 			{
 				printf("Invalid character in map\n");
 				return (1);

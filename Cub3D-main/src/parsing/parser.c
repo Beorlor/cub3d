@@ -68,6 +68,8 @@ int	is_map_valid(t_game *game)
 		return (1);
 	if (are_walls_valid(game) == 1)
 		return (1);
+	if (is_door_valid(game) == 1)
+		return (1);
 	return (0);
 }
 

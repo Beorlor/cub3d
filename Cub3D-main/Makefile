@@ -6,7 +6,7 @@
 #    By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 18:59:35 by jeza              #+#    #+#              #
-#    Updated: 2024/08/27 22:32:17 by jedurand         ###   ########.fr        #
+#    Updated: 2024/09/01 03:53:36 by jedurand         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,9 @@ SRCS = src/main.c src/events.c src/init.c src/utils.c src/graphic.c \
        src/parsing/eof_error.c src/parsing/fill_map.c src/parsing/map_errors.c \
        src/parsing/map_walls.c src/parsing/parser.c src/parsing/parser_description_file.c \
        src/parsing/valid_file.c src/parsing/file_errors.c src/parsing/file_utils.c \
-	   src/parsing/map_utils.c src/sprites/portal_gun.c src/sprites/wall_textures.c
+	   src/parsing/map_utils.c src/sprites/portal_gun.c src/sprites/wall_textures.c \
+	   src/parsing/set_up_direction.c src/parsing/set_up_textures_path.c \
+	   src/parsing/map_door.c src/sprites/gun_shot.c
 
 
 LIBFT = Libft/libft.a

@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:39:43 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/27 11:54:54 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/08/29 17:47:08 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	is_rgb_code(t_game *game, char *line)
 				printf("Invalid ceiling RGB color\n");
 			else
 				printf("Invalid floor RGB color\n");
+			free(line);
 			free_all2(game);
 		}
 		if (line[0] == 'F')
@@ -80,53 +81,17 @@ int	is_rgb_code(t_game *game, char *line)
 int	is_path_textures(t_game *game, char *line)
 {
 	if (ft_strncmp(line, "NO", 2) == 0 && line[2] == ' ')
-	{
-		if (game->texture_paths[NORTH] == NULL)
-			game->texture_paths[NORTH] = ft_strdup(line + 3);
-		else
-		{
-			printf("Invalid texture(s) - doublon\n");
-			free_all2(game);
-		}
-	}
+		north_path(game, line);
 	else if (ft_strncmp(line, "SO", 2) == 0 && line[2] == ' ')
-	{
-		if (game->texture_paths[SOUTH] == NULL)
-			game->texture_paths[SOUTH] = ft_strdup(line + 3);
-		else
-		{
-			printf("Invalid texture(s) - doublon\n");
-			free_all2(game);
-		}
-	}
+		south_path(game, line);
 	else if (ft_strncmp(line, "WE", 2) == 0 && line[2] == ' ')
-	{
-		if (game->texture_paths[WEST] == NULL)
-			game->texture_paths[WEST] = ft_strdup(line + 3);
-		else
-		{
-			printf("Invalid texture(s) - doublon\n");
-			free_all2(game);
-		}
-	}
+		west_path(game, line);
 	else if (ft_strncmp(line, "EA", 2) == 0 && line[2] == ' ')
-	{
-		if (game->texture_paths[EAST] == NULL)
-			game->texture_paths[EAST] = ft_strdup(line + 3);
-		else
-		{
-			printf("Invalid texture(s) - doublon\n");
-			free_all2(game);
-		}
-	}
+		east_path(game, line);
 	else
 		return (1);
 	return (0);
 }
-// printf("Textures : %s\n", game->texture_paths[NORTH]);
-// printf("Textures : %s\n", game->texture_paths[SOUTH]);
-// printf("Textures : %s\n", game->texture_paths[WEST]);
-// printf("Textures : %s\n", game->texture_paths[EAST]);
 
 int	check_textures_and_rgb(t_game *game, char *line, int *textures, int *rgb)
 {

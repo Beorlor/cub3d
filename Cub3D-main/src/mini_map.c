@@ -1,4 +1,3 @@
-
 #include "../cub3D.h"
 
 void draw_pixel(t_texture *img, int x, int y, int color)
@@ -24,15 +23,13 @@ void draw_mini_map(t_game *game)
             map_x = (int)((game->player.x - game->mini_map.width / 2 / T_SIZE) + x / T_SIZE);
             map_y = (int)((game->player.y - game->mini_map.height / 2 / T_SIZE) + y / T_SIZE);
 
-            //printf("Map Coordinates: map_x = %d, map_y = %d, for pixel x = %d, y = %d\n", map_x, map_y, x, y);
-			//printf("Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
-
-
-            // Check map boundaries and draw walls or empty spaces
+            // Check map boundaries and draw walls, doors, or empty spaces
             if (map_x >= 0 && map_x < game->map.width && map_y >= 0 && map_y < game->map.height)
             {
                 if (game->map.map[map_y][map_x] == '1')
                     draw_pixel(&game->mini_map, x, y, 0xFFFFFF); // Wall in white
+                else if (game->map.map[map_y][map_x] == 'D')
+                    draw_pixel(&game->mini_map, x, y, 0x00FF00); // Door in green
                 else
                     draw_pixel(&game->mini_map, x, y, 0x888888); // Empty space in gray
             }
@@ -54,7 +51,30 @@ void draw_mini_map(t_game *game)
     }
 }
 
-void    draw(t_texture *img, int x, int y, int color)
+int is_wall(t_game *game, double x, double y)
+{
+    int map_x = (int)x;
+    int map_y = (int)y;
+
+    // Check boundaries
+    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height)
+        return 1; // Out of bounds treated as a wall
+
+    // Check if it's a wall
+    if (game->map.map[map_y][map_x] == '1')
+        return 1; // Wall
+
+    // Check if it's a door and player is on or near the door
+    if (game->map.map[map_y][map_x] == 'D')
+    {
+        if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0)
+            return 1; // Treat door as wall if player is on or near the door
+    }
+
+    return 0; // No wall
+}
+
+void draw(t_texture *img, int x, int y, int color)
 {
     int i;
     int j;
@@ -94,22 +114,6 @@ void draw_player(t_game *game, t_texture *mini_map)
     // Draw the player's view direction
     draw_view_direction(game, mini_map);
 }
-
-
-int is_wall(t_game *game, double x, double y)
-{
-    int map_x = (int)x;
-    int map_y = (int)y;
-
-    // Check boundaries and return if it's a wall
-    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height)
-        return 1; // Out of bounds treated as a wall
-    if (game->map.map[map_y][map_x] == '1')
-        return 1; // Wall
-    return 0; // No wall
-}
-
-
 
 void draw_view_direction(t_game *game, t_texture *mini_map)
 {

@@ -1,8 +1,7 @@
 /* XPM */
-static char * portal_gun_xpm[] = {
+static char * guntest_xpm[] = {
 "200 131 2953 2",
-"X  c #FFFFFF",
-"  	c None",
+"  	c #FFFFFF",
 ". 	c #454232",
 "+ 	c #3F3D2E",
 "@ 	c #312F22",

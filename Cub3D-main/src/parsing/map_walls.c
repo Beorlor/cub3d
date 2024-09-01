@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_walls.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:51:29 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:22 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/08/29 16:19:25 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,11 @@ char	**get_map(t_game *game)
 		map[i] = ft_strdup(game->map.map[i]);
 		i++;
 	}
-	map[i] = NULL; // TO CHECK !!
+	map[i] = NULL;
 	return (map);
 }
 
+// Map to free !
 int	are_walls_valid(t_game *game)
 {
 	char	**map;
@@ -39,7 +40,7 @@ int	are_walls_valid(t_game *game)
 	if (map == NULL)
 		return (printf("Can't copy map\n"), 1);
 	if (flood_fill(game, map, game->player.x, game->player.y) == 1)
-		return (printf("Map is not surrounded by walls\n"), 1); // Map to free !
+		return (printf("Map is not surrounded by walls\n"), 1);
 	i = 0;
 	while (map[i])
 	{
@@ -50,46 +51,6 @@ int	are_walls_valid(t_game *game)
 	return (0);
 }
 
-// int are_walls_valid(t_game *game)
-// {
-//     char **map;
-//     int i;
-
-//     map = get_map(game);
-//     if (map == NULL)
-//         return (printf("Can't copy map\n"), 1);
-//     for (i = 0; i < game->map.width; i++)
-//     {
-//         if (map[0][i] == ' ')
-//             if (flood_fill(game, map, 0, i))
-// 				return (printf("Map is not surrounded by walls\n"), 1);
-//         if (map[game->map.height - 1][i] == ' ')
-//             if (flood_fill(game, map, game->map.height - 1, i))
-// 				return (printf("Map is not surrounded by walls\n"), 1);
-//     }
-//     for (i = 0; i < game->map.height; i++)
-//     {
-//         if (map[i][0] == ' ')
-//             if (flood_fill(game, map, i, 0))
-// 				return (printf("Map is not surrounded by walls\n"), 1);
-//         if (map[i][game->map.width - 1] == ' ')
-//             if (flood_fill(game, map, i, game->map.width - 1))
-// 				return (printf("Map is not surrounded by walls\n"), 1);
-//     }
-//     i = 0;
-//     while (map[i])
-//     {
-//         free(map[i]);
-//         i++;
-//     }
-//     free(map);
-
-//     return 0;
-// }
-
-// ligne y / colonne x
-// printf("Height : %d\n", game->map.height);
-// printf("Width : %d\n", game->map.width);
 int	flood_fill(t_game *game, char **map, int x, int y)
 {
 	if (x < 0 || y < 0 || x >= game->map.width || y >= game->map.height)
@@ -116,16 +77,6 @@ int	flood_fill(t_game *game, char **map, int x, int y)
 		return (1);
 	return (0);
 }
-// Check diagonales aussi avec x + 1 / y + 1 et etc.
-//         if (flood_fill(game, map, x - 1, y - 1) || // Haut-Gauche
-//             flood_fill(game, map, x - 1, y) ||    // Haut
-//             flood_fill(game, map, x - 1, y + 1) ||// Haut-Droite
-//             flood_fill(game, map, x, y - 1) ||    // Gauche
-//             flood_fill(game, map, x, y + 1) ||    // Droite
-//             flood_fill(game, map, x + 1, y - 1) ||// Bas-Gauche
-//             flood_fill(game, map, x + 1, y) ||    // Bas
-//             flood_fill(game, map, x + 1, y + 1))  // Bas-Droite
-//             return 1;
 
 // int flood_fill(t_game *game, char **map, int x, int y)
 // {
