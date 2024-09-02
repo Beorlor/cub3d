@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 02:45:07 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 03:04:35 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	create_ball(t_game *game, int button)
 
 		ball->size = ball->texture.width;
 		ball->stage = 1; // Start at stage 1
-		ball->speed = 0.05; // Slow speed for map movement
+		ball->speed = 0.3; // Slow speed for map movement
 
 		// Set the direction based on the player's direction
 		ball->direction_x = game->player.dir_x;
@@ -85,8 +85,8 @@ void move_ball_towards_center(t_game *game, t_ball *ball)
 
     if (distance > 100.0)
     {
-        ball->wx += (dx / distance) * 15;  // Faster movement to the center
-        ball->wy += (dy / distance) * 15;
+        ball->wx += (dx / distance) * 20;  // Faster movement to the center
+        ball->wy += (dy / distance) * 20;
     }
     else
     {
@@ -129,7 +129,7 @@ void	move_ball_towards_wall(t_game *game, t_ball *ball)
 	//ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
 
 	// Shrink the ball as it moves
-	ball->size = fmax(5, ball->size - 1);
+	ball->size = fmax(5, ball->size - 4);
 
 	// Continue moving even if the ball is small, until it hits a wall
 }
