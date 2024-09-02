@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 01:58:02 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 02:00:52 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,7 @@ void	load_ball_textures(t_game *game)
 			&game->ball[1].texture.size_line, &game->ball[1].texture.endian);
 }
 
-// Draw the ball on the screen using my_mlx_pixel_put on the frame buffer
+// Draw the ball on the screen using my_mlx_pixel_put on the frame buffer, with shrinking
 void	draw_ball(t_game *game, t_texture *frame)
 {
 	int	i;
@@ -201,22 +201,34 @@ void	draw_ball(t_game *game, t_texture *frame)
 			int tex_width = game->ball[i].texture.width;
 			int tex_height = game->ball[i].texture.height;
 
-			// Loop through each pixel of the texture
-			for (int y = 0; y < tex_height; y++)
+			// Calculate the scale factor based on the current ball size
+			double scale_x = (double)game->ball[i].size / tex_width;
+			double scale_y = (double)game->ball[i].size / tex_height;
+
+			// Loop through each pixel of the screen where the ball should be drawn
+			for (int y = 0; y < game->ball[i].size; y++)
 			{
-				for (int x = 0; x < tex_width; x++)
+				for (int x = 0; x < game->ball[i].size; x++)
 				{
-					// Get the color from the texture
-					int color = game->ball[i].texture.addr[y * tex_width + x];
+					// Calculate the corresponding position in the texture
+					int tex_x = (int)(x / scale_x);
+					int tex_y = (int)(y / scale_y);
 
-					// Calculate the position to draw the pixel on the screen
-					int screen_x = game->ball[i].wx + x;
-					int screen_y = game->ball[i].wy + y;
-
-					// Draw the pixel if it's within the window bounds
-					if (screen_x >= 0 && screen_x < game->win_width && screen_y >= 0 && screen_y < game->win_height)
+					// Ensure the texture coordinates are within bounds
+					if (tex_x >= 0 && tex_x < tex_width && tex_y >= 0 && tex_y < tex_height)
 					{
-						my_mlx_pixel_put(frame, screen_x, screen_y, color);
+						// Get the color from the texture
+						int color = game->ball[i].texture.addr[tex_y * tex_width + tex_x];
+
+						// Calculate the position to draw the pixel on the screen
+						int screen_x = game->ball[i].wx + x;
+						int screen_y = game->ball[i].wy + y;
+
+						// Draw the pixel if it's within the window bounds and not transparent
+						if (screen_x >= 0 && screen_x < game->win_width && screen_y >= 0 && screen_y < game->win_height && color != 0x000000)
+						{
+							my_mlx_pixel_put(frame, screen_x, screen_y, color);
+						}
 					}
 				}
 			}
