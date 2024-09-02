@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 02:28:04 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 02:45:07 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,35 +72,31 @@ void	create_ball(t_game *game, int button)
 }
 
 // Move the ball towards the center of the screen (first stage of the animation)
-void	move_ball_towards_center(t_game *game, t_ball *ball)
+void move_ball_towards_center(t_game *game, t_ball *ball)
 {
-	double	center_x;
-	double	center_y;
-	double	dx;
-	double	dy;
-	double	distance;
+    double center_x = game->win_width / 2.0;
+    double center_y = game->win_height / 2.0;
+    double dx = center_x - (ball->wx + ball->size / 2.0);
+    double dy = center_y - (ball->wy + ball->size / 2.0);
+    double distance = sqrt(dx * dx + dy * dy);
 
-	center_x = game->win_width / 2.0;
-	center_y = game->win_height / 2.0;
-	dx = center_x - (ball->wx + ball->size / 2.0);
-	dy = center_y - (ball->wy + ball->size / 2.0);
-	distance = sqrt(dx * dx + dy * dy);
+    // Shrink the ball slightly as it moves towards the center
+    ball->size = fmax(5, ball->size - 1);
 
-	// Shrink the ball slightly as it moves towards the center
-	ball->size = fmax(5, ball->size - 1);
-
-	if (distance > 5.0)
-	{
-		ball->wx += (dx / distance) * 15;  // Faster movement to the center
-		ball->wy += (dy / distance) * 15;
-	}
-	else
-	{
-		ball->wx = center_x - (ball->size / 2.0);
-		ball->wy = center_y - (ball->size / 2.0);
-		ball->stage = 2; // Move to stage 2
-	}
+    if (distance > 100.0)
+    {
+        ball->wx += (dx / distance) * 15;  // Faster movement to the center
+        ball->wy += (dy / distance) * 15;
+    }
+    else
+    {
+        // Ensure the ball ends exactly in the center for Stage 2 transition
+        ball->wx = center_x - (ball->size / 2.0);
+        ball->wy = center_y - (ball->size / 2.0);
+        ball->stage = 2; // Move to stage 2
+    }
 }
+
 
 // Move the ball slowly across the map towards the wall (second stage of the animation)
 void	move_ball_towards_wall(t_game *game, t_ball *ball)
