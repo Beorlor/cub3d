@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 02:19:30 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/02 02:28:04 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,8 @@ void	move_ball_towards_wall(t_game *game, t_ball *ball)
 	ball->y = next_y;
 
 	// Update the window coordinates and adjust for shrinking size
-	ball->wx = game->win_width / 2.0 + (next_x - game->player.x) * T_SIZE - (ball->size / 2.0);
-	ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
+	//ball->wx = game->win_width / 2.0 + (next_x - game->player.x) * T_SIZE - (ball->size / 2.0);
+	//ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
 
 	// Shrink the ball as it moves
 	ball->size = fmax(5, ball->size - 1);
@@ -204,10 +204,18 @@ void draw_ball(t_game *game, t_texture *frame)
             double scale_x = (double)game->ball[i].size / tex_width;
             double scale_y = (double)game->ball[i].size / tex_height;
 
-            // Calculate starting position to keep the ball centered horizontally
-            // during stage 1, and at its map position during stage 2
-            int start_x = (game->ball[i].stage == 1) ? (game->win_width / 2) - (game->ball[i].size / 2) : game->ball[i].wx - (game->ball[i].size / 2);
-            int start_y = game->ball[i].wy - (game->ball[i].size / 2);
+            // Determine start_x and start_y based on the stage
+            int start_x, start_y;
+
+            if (game->ball[i].stage == 1) {
+                // Stage 1: Centered horizontally in the screen, moving vertically towards the center
+                start_x = (game->win_width / 2) - (game->ball[i].size / 2);
+                start_y = game->ball[i].wy - (game->ball[i].size / 2);
+            } else if (game->ball[i].stage == 2) {
+                // Stage 2: Centered based on wx and wy, representing its position in the world
+                start_x = (game->win_width / 2) - (game->ball[i].size / 2);
+                start_y = (game->win_width / 2) - (game->ball[i].size / 2);
+            }
 
             // Loop through each pixel of the screen where the ball should be drawn
             for (int y = 0; y < game->ball[i].size; y++)
