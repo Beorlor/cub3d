@@ -2,16 +2,12 @@ Dans les trucs a faire :
 
 Noir autour du sprite
 
-Math lier a animation boule
 Remettre les rotations touches
 
 
 Norme
 
-
-Xpm portail
 Portail
 
 
-i dont want the balls to be destroy is too small, even if not visible on the screen it should continue until a wall
-make the sprite shrink, the displayed img stay the same all the long so its weird, make the starting draw position of the printed balls change as the displayed sprite is smaller
+bug balls can pass throug door

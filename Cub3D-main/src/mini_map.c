@@ -64,11 +64,21 @@ int is_wall(t_game *game, double x, double y)
     if (game->map.map[map_y][map_x] == '1')
         return 1; // Wall
 
-    // Check if it's a door and player is on or near the door
+    // Check if it's a door and player is near
     if (game->map.map[map_y][map_x] == 'D')
     {
         if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0)
-            return 1; // Treat door as wall if player is on or near the door
+            return 1; // Treat door as wall if player is near
+    }
+
+    // Check if it's a portal (blue or orange)
+    if (game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3')
+    {
+        if (game->ball[0].x == x && game->ball[0].y == y)
+            game->ball[0].active = 0; // Deactivate the blue ball
+        else if (game->ball[1].x == x && game->ball[1].y == y)
+            game->ball[1].active = 0; // Deactivate the orange ball
+        return 1; // Treat portals as walls for collision purposes
     }
 
     return 0; // No wall

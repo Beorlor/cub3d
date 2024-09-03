@@ -23,7 +23,17 @@ void	init_player(t_player *player)
 	player->speed = 0.05;
 	player->rot_speed = 0.04;
 }
-// speed : vitesse du player en pixels.
+void init_portals(t_game *game)
+{
+    for (int i = 0; i < 2; i++)
+    {
+        game->portals[i].active = 0;
+        game->portals[i].x = 0;
+        game->portals[i].y = 0;
+        game->portals[i].texture.img = NULL;
+        game->portals[i].texture.addr = NULL;
+    }
+}
 
 // memset(game->texture_paths, 0, sizeof(game->texture_paths));
 void	init_game(t_game *game)
@@ -45,6 +55,7 @@ void	init_game(t_game *game)
 	init_textures(game);
 	init_ball(game);
 	load_portal_gun(game);
+	init_portals(game);
 	game->frame_count = 0;
 	game->walk_offset = 0;
 	game->skip_mouse_event = 0;

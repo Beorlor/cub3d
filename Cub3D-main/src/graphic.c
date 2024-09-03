@@ -21,7 +21,7 @@ void render_scene(t_game *game, t_texture *frame) {
         }
     }
 
-    // Raycasting to draw the walls and doors
+    // Raycasting to draw the walls, doors, and portals
     for (int x = 0; x < game->win_width; x++) {
         // Calculate ray position and direction
         double camera_x = (2 * x / (double)game->win_width - 1) / 2;
@@ -57,7 +57,7 @@ void render_scene(t_game *game, t_texture *frame) {
         }
 
         // Perform DDA (Digital Differential Analysis)
-        int hit = 0;  // Was there a wall or door hit?
+        int hit = 0;  // Was there a wall, door, or portal hit?
         int side;     // Was a NS or a EW wall hit?
 
         while (hit == 0) {
@@ -72,10 +72,11 @@ void render_scene(t_game *game, t_texture *frame) {
                 side = 1;
             }
 
-            // Check if ray has hit a wall or door
+            // Check if ray has hit a wall, door, or portal
             if (game->map.map[map_y][map_x] == '1' ||
-                (game->map.map[map_y][map_x] == 'D' && fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0)) {
-                hit = 1;  // Wall or door hit
+                (game->map.map[map_y][map_x] == 'D' && fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0) ||
+                game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+                hit = 1;  // Wall, door, or portal hit
             }
         }
 
@@ -95,15 +96,20 @@ void render_scene(t_game *game, t_texture *frame) {
         int draw_end = line_height / 2 + game->win_height / 2 + walk_offset;
         if (draw_end >= game->win_height) draw_end = game->win_height - 1;
 
-        // Determine texture index based on wall hit direction
-        int texture_index;
-        if (side == 0) {
-            texture_index = (step_x > 0) ? EAST : WEST;
+        // Determine the texture based on what was hit (wall, door, or portal)
+        t_texture *texture;
+
+        if (game->map.map[map_y][map_x] == '2') {
+            texture = &game->portals[0].texture;  // Use blue portal texture
+        } else if (game->map.map[map_y][map_x] == '3') {
+            texture = &game->portals[1].texture;  // Use orange portal texture
+        } else if (side == 0) {
+            texture = (step_x > 0) ? &game->textures[EAST] : &game->textures[WEST];
         } else {
-            texture_index = (step_y > 0) ? SOUTH : NORTH;
+            texture = (step_y > 0) ? &game->textures[SOUTH] : &game->textures[NORTH];
         }
 
-        // Calculate the exact position where the wall was hit
+        // Calculate the exact position where the wall/portal was hit
         double wall_x;
         if (side == 0)
             wall_x = game->player.y + perp_wall_dist * ray_dir_y;
@@ -112,24 +118,24 @@ void render_scene(t_game *game, t_texture *frame) {
         wall_x -= floor(wall_x);
 
         // X coordinate on the texture
-        int tex_x = (int)(wall_x * (double)game->textures[texture_index].width);
+        int tex_x = (int)(wall_x * (double)texture->width);
         if (tex_x < 0) tex_x = 0;
-        if (tex_x >= game->textures[texture_index].width) tex_x = game->textures[texture_index].width - 1;
+        if (tex_x >= texture->width) tex_x = texture->width - 1;
 
         // Fix the texture direction issue
-        if (side == 0 && step_x < 0) tex_x = game->textures[texture_index].width - tex_x - 1;
-        if (side == 1 && step_y > 0) tex_x = game->textures[texture_index].width - tex_x - 1;
+        if (side == 0 && step_x < 0) tex_x = texture->width - tex_x - 1;
+        if (side == 1 && step_y > 0) tex_x = texture->width - tex_x - 1;
 
-        // Draw the wall or door with texture
+        // Draw the wall, door, or portal with texture
         for (int y = draw_start; y < draw_end; y++) {
             // Calculate the y-coordinate on the texture, considering walk offset
-            int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * game->textures[texture_index].height) / line_height / 256;
+            int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * texture->height) / line_height / 256;
 
             if (tex_y < 0) tex_y = 0;
-            if (tex_y >= game->textures[texture_index].height) tex_y = game->textures[texture_index].height - 1;
+            if (tex_y >= texture->height) tex_y = texture->height - 1;
 
             // Get the color from the texture
-            int color = game->textures[texture_index].addr[tex_y * game->textures[texture_index].width + tex_x];
+            int color = texture->addr[tex_y * texture->width + tex_x];
 
             // Darken the color if it's a side wall or door (for a shading effect)
             if (side == 1) color = (color >> 1) & 0x7F7F7F;

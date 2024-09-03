@@ -134,6 +134,14 @@ typedef struct s_map
 	int		height;
 }	t_map;
 
+typedef struct s_portal
+{
+    int active;  // Indicates whether the portal is active or not
+    double x;    // The x-coordinate of the portal on the map
+    double y;    // The y-coordinate of the portal on the map
+    t_texture texture;  // The texture associated with the portal
+} t_portal;
+
 typedef struct s_player
 {
 	double	x;
@@ -169,6 +177,7 @@ typedef struct s_game
 	int			touch_state[6];
 	int         walk_offset;   // Variable to simulate the walk effect
 	int         frame_count;   // Frame counter to animate walk effect
+	t_portal portals[2]; // portals[0] is blue, portals[1] is orange
 	int skip_mouse_event;
 }	t_game;
 
@@ -253,6 +262,7 @@ void	check_nb_of_rgb_textures(int rgb, int textures, t_game *game, int fd);
 void	init_ceiling_colors(t_game *game, int r, int g, int b);
 void	init_floor_colors(t_game *game, int r, int g, int b);
 int		are_textures_xpm(t_game *game);
+void load_portal_textures(t_game *game);
 
 // EVENTS MANAGEMENT
 int		mouse_move(int x, int y, t_input *input);

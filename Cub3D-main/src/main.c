@@ -84,6 +84,7 @@ int	main(int argc, char *argv[])
 	fill_map(&game, map);
 	manage_errors(&game, map);
 	create_textures(&game);
+	load_portal_textures(&game);
 	create_window(&game);
 	mlx_loop(game.mlx);
 	free(map);

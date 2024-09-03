@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 03:04:35 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 00:51:48 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,40 +98,43 @@ void move_ball_towards_center(t_game *game, t_ball *ball)
 }
 
 
-// Move the ball slowly across the map towards the wall (second stage of the animation)
-void	move_ball_towards_wall(t_game *game, t_ball *ball)
+void place_portal(t_game *game, int portal_index, int map_x, int map_y)
 {
-	double	next_x;
-	double	next_y;
-	int		map_x;
-	int		map_y;
+    // Deactivate the previous portal if it exists
+    if (game->portals[portal_index].active)
+    {
+        game->map.map[(int)game->portals[portal_index].y][(int)game->portals[portal_index].x] = '1'; // Reset the previous position to wall
+    }
 
-	// Calculate next position on the map
-	next_x = ball->x + ball->direction_x * ball->speed;
-	next_y = ball->y + ball->direction_y * ball->speed;
+    // Place the new portal
+    game->portals[portal_index].active = 1;
+    game->portals[portal_index].x = map_x;
+    game->portals[portal_index].y = map_y;
+    game->map.map[map_y][map_x] = (portal_index == 0) ? '2' : '3'; // 2 for blue, 3 for orange
+}
 
-	// Check if the ball hits a wall
-	map_x = (int)next_x;
-	map_y = (int)next_y;
-	if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1')
-	{
-		printf("Ball disappeared at size: %d\n", ball->size);
-		ball->active = 0;
-		return;
-	}
+void move_ball_towards_wall(t_game *game, t_ball *ball)
+{
+    double next_x = ball->x + ball->direction_x * ball->speed;
+    double next_y = ball->y + ball->direction_y * ball->speed;
+    int map_x = (int)next_x;
+    int map_y = (int)next_y;
 
-	// Update ball position on the map
-	ball->x = next_x;
-	ball->y = next_y;
+    // Check if the ball hits a wall
+    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1')
+    {
+        int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
+        place_portal(game, portal_index, map_x, map_y);
+        ball->active = 0; // Deactivate the ball after placing the portal
+        return;
+    }
 
-	// Update the window coordinates and adjust for shrinking size
-	//ball->wx = game->win_width / 2.0 + (next_x - game->player.x) * T_SIZE - (ball->size / 2.0);
-	//ball->wy = game->win_height / 2.0 + (next_y - game->player.y) * T_SIZE - (ball->size / 2.0);
+    // Update ball position on the map
+    ball->x = next_x;
+    ball->y = next_y;
 
-	// Shrink the ball as it moves
-	ball->size = fmax(5, ball->size - 4);
-
-	// Continue moving even if the ball is small, until it hits a wall
+    // Shrink the ball as it moves
+    ball->size = fmax(5, ball->size - 4);
 }
 
 // Update the state of the balls
