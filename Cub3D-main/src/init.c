@@ -32,6 +32,8 @@ void init_portals(t_game *game)
         game->portals[i].y = 0;
         game->portals[i].texture.img = NULL;
         game->portals[i].texture.addr = NULL;
+		game->portals[i].direction = 0;
+		game->portals[i].link = 0;
     }
 }
 

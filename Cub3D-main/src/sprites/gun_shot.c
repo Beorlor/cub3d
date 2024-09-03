@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 00:51:48 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 01:25:38 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,11 +98,9 @@ void move_ball_towards_center(t_game *game, t_ball *ball)
 }
 
 
-void place_portal(t_game *game, int portal_index, int map_x, int map_y)
-{
+void place_portal(t_game *game, int portal_index, int map_x, int map_y, int direction) {
     // Deactivate the previous portal if it exists
-    if (game->portals[portal_index].active)
-    {
+    if (game->portals[portal_index].active) {
         game->map.map[(int)game->portals[portal_index].y][(int)game->portals[portal_index].x] = '1'; // Reset the previous position to wall
     }
 
@@ -110,21 +108,44 @@ void place_portal(t_game *game, int portal_index, int map_x, int map_y)
     game->portals[portal_index].active = 1;
     game->portals[portal_index].x = map_x;
     game->portals[portal_index].y = map_y;
+    game->portals[portal_index].direction = direction;
     game->map.map[map_y][map_x] = (portal_index == 0) ? '2' : '3'; // 2 for blue, 3 for orange
+
+    // Check if the two portals are now linked
+    if (game->portals[0].active && game->portals[1].active) {
+        game->portals[0].link = 1;
+        game->portals[1].link = 1;
+    }
 }
 
-void move_ball_towards_wall(t_game *game, t_ball *ball)
-{
+
+void move_ball_towards_wall(t_game *game, t_ball *ball) {
     double next_x = ball->x + ball->direction_x * ball->speed;
     double next_y = ball->y + ball->direction_y * ball->speed;
     int map_x = (int)next_x;
     int map_y = (int)next_y;
 
+    int direction;
+
+    // Determine the direction the portal is facing based on the ball's movement
+    if (fabs(ball->direction_x) > fabs(ball->direction_y)) {
+        if (ball->direction_x > 0) {
+            direction = EAST;
+        } else {
+            direction = WEST;
+        }
+    } else {
+        if (ball->direction_y > 0) {
+            direction = SOUTH;
+        } else {
+            direction = NORTH;
+        }
+    }
+
     // Check if the ball hits a wall
-    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1')
-    {
+    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1') {
         int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
-        place_portal(game, portal_index, map_x, map_y);
+        place_portal(game, portal_index, map_x, map_y, direction);
         ball->active = 0; // Deactivate the ball after placing the portal
         return;
     }
@@ -136,6 +157,7 @@ void move_ball_towards_wall(t_game *game, t_ball *ball)
     // Shrink the ball as it moves
     ball->size = fmax(5, ball->size - 4);
 }
+
 
 // Update the state of the balls
 void	update_balls(t_game *game)

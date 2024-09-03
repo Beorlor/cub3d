@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/02 01:57:52 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 01:27:01 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,47 @@ void draw_center_circle(t_game *game, int radius)
 	}
 }
 
+void check_portal_teleport(t_game *game) {
+    int portal_index = -1;
+
+    // Check if the player is on a portal
+    if (game->map.map[(int)game->player.y][(int)game->player.x] == '2') {
+        portal_index = 0;
+    } else if (game->map.map[(int)game->player.y][(int)game->player.x] == '3') {
+        portal_index = 1;
+    }
+
+    if (portal_index != -1 && game->portals[portal_index].link) {
+        int other_portal = (portal_index == 0) ? 1 : 0;
+
+        // Teleport the player to the other portal's location
+        game->player.x = game->portals[other_portal].x + 0.5;
+        game->player.y = game->portals[other_portal].y + 0.5;
+
+        // Adjust player direction based on portal orientations
+        if (game->portals[portal_index].direction == game->portals[other_portal].direction) {
+            // Same direction, do nothing
+        } else if (abs(game->portals[portal_index].direction - game->portals[other_portal].direction) == 2) {
+            // Opposite directions, rotate 180 degrees
+            game->player.dir_x = -game->player.dir_x;
+            game->player.dir_y = -game->player.dir_y;
+        } else {
+            // Rotate 90 degrees based on direction difference
+            double old_dir_x = game->player.dir_x;
+            if ((game->portals[portal_index].direction == NORTH && game->portals[other_portal].direction == EAST) ||
+                (game->portals[portal_index].direction == EAST && game->portals[other_portal].direction == SOUTH) ||
+                (game->portals[portal_index].direction == SOUTH && game->portals[other_portal].direction == WEST) ||
+                (game->portals[portal_index].direction == WEST && game->portals[other_portal].direction == NORTH)) {
+                game->player.dir_x = -game->player.dir_y;
+                game->player.dir_y = old_dir_x;
+            } else {
+                game->player.dir_x = game->player.dir_y;
+                game->player.dir_y = -old_dir_x;
+            }
+        }
+    }
+}
+
 
 int display_each_frame(t_game *game)
 {
@@ -197,6 +238,7 @@ int display_each_frame(t_game *game)
 	mlx_destroy_image(game->mlx, frame.img);
 	// Handle player movement and actions
 	is_action(game);
+	check_portal_teleport(game);
 	display_portal_gun(game);  // Handle gun display
 	return 0;
 }

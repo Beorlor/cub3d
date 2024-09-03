@@ -134,13 +134,15 @@ typedef struct s_map
 	int		height;
 }	t_map;
 
-typedef struct s_portal
-{
-    int active;  // Indicates whether the portal is active or not
-    double x;    // The x-coordinate of the portal on the map
-    double y;    // The y-coordinate of the portal on the map
-    t_texture texture;  // The texture associated with the portal
+typedef struct s_portal {
+    t_texture texture;
+    int active;
+    double x;
+    double y;
+    int direction; // Direction of the portal (NORTH, SOUTH, EAST, WEST)
+    int link; // Boolean, 0 if not linked, 1 if linked
 } t_portal;
+
 
 typedef struct s_player
 {

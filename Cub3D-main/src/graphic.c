@@ -140,8 +140,13 @@ void render_scene(t_game *game, t_texture *frame) {
             // Darken the color if it's a side wall or door (for a shading effect)
             if (side == 1) color = (color >> 1) & 0x7F7F7F;
 
-            // Draw the pixel
-            my_mlx_pixel_put(frame, x, y, color);
+            // Render the wall first
+            if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == 'D') {
+                my_mlx_pixel_put(frame, x, y, color);
+            } else if (game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+                // Render the portal over the wall
+                my_mlx_pixel_put(frame, x, y, color);
+            }
         }
     }
 }
