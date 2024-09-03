@@ -74,7 +74,7 @@ void render_scene(t_game *game, t_texture *frame) {
 
             // Check if ray has hit a wall, door, or portal
             if (game->map.map[map_y][map_x] == '1' ||
-                (game->map.map[map_y][map_x] == 'D' && fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0) ||
+                game->map.map[map_y][map_x] == 'D' ||
                 game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
                 hit = 1;  // Wall, door, or portal hit
             }
@@ -98,15 +98,22 @@ void render_scene(t_game *game, t_texture *frame) {
 
         // Determine the texture based on what was hit (wall, door, or portal)
         t_texture *texture;
+        t_texture *overlay_texture = NULL;
 
-        if (game->map.map[map_y][map_x] == '2') {
-            texture = &game->portals[0].texture;  // Use blue portal texture
-        } else if (game->map.map[map_y][map_x] == '3') {
-            texture = &game->portals[1].texture;  // Use orange portal texture
-        } else if (side == 0) {
+        if (side == 0) {
             texture = (step_x > 0) ? &game->textures[EAST] : &game->textures[WEST];
         } else {
             texture = (step_y > 0) ? &game->textures[SOUTH] : &game->textures[NORTH];
+        }
+
+        if (game->map.map[map_y][map_x] == '2') {
+            if (side == game->portals[0].direction) {
+                overlay_texture = &game->portals[0].texture;  // Use blue portal texture
+            }
+        } else if (game->map.map[map_y][map_x] == '3') {
+            if (side == game->portals[1].direction) {
+                overlay_texture = &game->portals[1].texture;  // Use orange portal texture
+            }
         }
 
         // Calculate the exact position where the wall/portal was hit
@@ -126,7 +133,7 @@ void render_scene(t_game *game, t_texture *frame) {
         if (side == 0 && step_x < 0) tex_x = texture->width - tex_x - 1;
         if (side == 1 && step_y > 0) tex_x = texture->width - tex_x - 1;
 
-        // Draw the wall, door, or portal with texture
+        // Draw the wall with the texture
         for (int y = draw_start; y < draw_end; y++) {
             // Calculate the y-coordinate on the texture, considering walk offset
             int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * texture->height) / line_height / 256;
@@ -137,15 +144,30 @@ void render_scene(t_game *game, t_texture *frame) {
             // Get the color from the texture
             int color = texture->addr[tex_y * texture->width + tex_x];
 
-            // Darken the color if it's a side wall or door (for a shading effect)
+            // Darken the color if it's a side wall (for a shading effect)
             if (side == 1) color = (color >> 1) & 0x7F7F7F;
 
-            // Render the wall first
-            if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == 'D') {
-                my_mlx_pixel_put(frame, x, y, color);
-            } else if (game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
-                // Render the portal over the wall
-                my_mlx_pixel_put(frame, x, y, color);
+            // Draw the wall pixel
+            my_mlx_pixel_put(frame, x, y, color);
+
+            // If a portal is supposed to be drawn, overlay it
+            if (overlay_texture) {
+                // Calculate the coordinates on the portal texture
+                int overlay_tex_x = (int)(wall_x * (double)overlay_texture->width);
+                if (overlay_tex_x < 0) overlay_tex_x = 0;
+                if (overlay_tex_x >= overlay_texture->width) overlay_tex_x = overlay_texture->width - 1;
+
+                int overlay_tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * overlay_texture->height) / line_height / 256;
+
+                if (overlay_tex_y < 0) overlay_tex_y = 0;
+                if (overlay_tex_y >= overlay_texture->height) overlay_tex_y = overlay_texture->height - 1;
+
+                int overlay_color = overlay_texture->addr[overlay_tex_y * overlay_texture->width + overlay_tex_x];
+
+                // Only draw the portal texture if the pixel is not black
+                if ((overlay_color & 0xFFFFFF) != 0x000000) {
+                    my_mlx_pixel_put(frame, x, y, overlay_color);
+                }
             }
         }
     }

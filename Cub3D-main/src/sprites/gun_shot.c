@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 01:25:38 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 01:53:21 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,6 @@ void place_portal(t_game *game, int portal_index, int map_x, int map_y, int dire
     }
 }
 
-
 void move_ball_towards_wall(t_game *game, t_ball *ball) {
     double next_x = ball->x + ball->direction_x * ball->speed;
     double next_y = ball->y + ball->direction_y * ball->speed;
@@ -142,8 +141,9 @@ void move_ball_towards_wall(t_game *game, t_ball *ball) {
         }
     }
 
-    // Check if the ball hits a wall
-    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height || game->map.map[map_y][map_x] == '1') {
+    // Check if the ball hits a wall or portal
+    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
+        game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
         int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
         place_portal(game, portal_index, map_x, map_y, direction);
         ball->active = 0; // Deactivate the ball after placing the portal
