@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+         #
+#    By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 18:59:35 by jeza              #+#    #+#              #
-#    Updated: 2024/09/04 01:04:52 by jedurand         ###   ########.fr        #
+#    Updated: 2024/09/04 16:10:57 by jeguerin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,8 @@ SRCS = src/main.c src/events.c src/init.c src/utils.c src/graphic.c \
        src/parsing/valid_file.c src/parsing/file_errors.c src/parsing/file_utils.c \
 	   src/parsing/map_utils.c src/sprites/portal_gun.c src/sprites/wall_textures.c \
 	   src/parsing/set_up_direction.c src/parsing/set_up_textures_path.c \
-	   src/parsing/map_door.c src/sprites/gun_shot.c src/parsing/portal_parsing.c
+	   src/parsing/map_door.c src/sprites/gun_shot.c src/parsing/portal_parsing.c \
+	   src/manage_mouse.c src/init3.c src/draw_mini_map.c src/is_moving.c \
 
 
 LIBFT = Libft/libft.a

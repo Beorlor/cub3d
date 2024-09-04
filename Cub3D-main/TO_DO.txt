@@ -4,13 +4,13 @@ teleportation (seul truc chiant encore a faire)
 
 Noir autour du sprite du portal gun (ez)
 
-Remettre les rotations touches et souris (ez)
+Remettre les rotations touches et souris (ez) => DONE
 
 minimap pixel bleu et orange pour 2 et 3 (ez)
 
 mettre les bonnes textures (ez)
 
-leaks + norme
+leaks + norme => ALMOST DONE
 
 pour la norme tout sauf gun_shot.c / graphic.c / is_wall / render_frame / check_portal_teleport
 

@@ -3,17 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   file_errors.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:25:48 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:07 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 19:06:45 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../cub3D.h"
 
-// Manage if we've a doublon in start position & orientation of the player.
-// So : NO/SO/WE/EA
 int	are_file_textures_valid(t_game *game)
 {
 	int	i;
@@ -58,7 +56,7 @@ int	are_paths_textures_valid(t_game *game)
 }
 
 // fd = open_file(file, fd, game);
-int	are_rgb_ids_valid(t_game *game, const char *file)
+int	are_rgb_ids_valid(const char *file)
 {
 	int		fd;
 	int		is_floor;
@@ -67,7 +65,9 @@ int	are_rgb_ids_valid(t_game *game, const char *file)
 	char	*line;
 
 	init_type(&is_floor, &is_ceiling, &fd);
-	fd = open_file(file, fd, game);
+	fd = open_file(file, fd);
+	if (fd == -1)
+		return (1);
 	while (1)
 	{
 		line = get_next_line(fd);

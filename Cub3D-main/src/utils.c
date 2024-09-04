@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 09:24:13 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/07/25 11:52:52 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/04 16:30:18 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ int	ft_atoi2(const char *nptr)
 		return (-1);
 	return (result * sign);
 }
-// TO TEST WITH THE i !!
 
 int	ft_strncmp_cub(const char *s1, char c, size_t n)
 {

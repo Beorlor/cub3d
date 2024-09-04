@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   file_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:54:57 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:13 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:55:13 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../cub3D.h"
 
-int	open_file(const char *file, int fd, t_game *game)
+int	open_file(const char *file, int fd)
 {
 	fd = open(file, O_RDONLY);
 	if (fd == -1)
 	{
 		printf("Could not open the map file\n");
-		free_all2(game);
+		return (-1);
 	}
 	return (fd);
 }

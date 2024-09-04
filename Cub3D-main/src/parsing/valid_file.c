@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   valid_file.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:47:26 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/25 20:38:31 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 18:08:55 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,10 @@ int	is_file_full(const char *file, t_game *game)
 
 int	is_end_of_map(char *line, int fd)
 {
+	(void)fd;
 	if (!only_space(line))
 	{
 		printf("Map is not the last element in file\n");
-		free (line);
-		close(fd);
 		return (1);
 	}
 	return (0);
@@ -96,12 +95,12 @@ int	is_end_of_map(char *line, int fd)
 
 int	check_map(char *line, int fd, int map_ended)
 {
+	(void)fd;
 	if (only_space(line))
 		map_ended = 1;
 	else if (!check_map_line(line))
 	{
 		printf("Invalid character found in map\n");
-		close (fd);
 		return (-1);
 	}
 	return (map_ended);

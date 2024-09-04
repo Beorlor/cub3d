@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:51:29 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/08/29 16:19:25 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/04 14:39:01 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ char	**get_map(t_game *game)
 	return (map);
 }
 
-// Map to free !
 int	are_walls_valid(t_game *game)
 {
 	char	**map;

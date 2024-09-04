@@ -3,31 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   move_player.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 02:49:27 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 20:14:52 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3D.h"
 
-// void	check_map_path(double x, double y, t_game *game)
-// {
-// 	if (game->map.map[y][x] != '1')
-// 	{
-// 		mlx_put_image_to_window(game->mlx, game->win, game->floor.b,
-//			game->player.x, game->player.y);
-// 		game->player.x = x;
-// 		game->player.y = y;
-// 		mlx_put_image_to_window(game->mlx, game->win, game->ceiling.r,
-//			game->player.x, game->player.y);
-// 	}
-// }
-
-// printf("Map-x : %d\n", map_x);
-	// printf("Width : %d\n", game->map.width);
-	// printf("Height : %d\n", game->map.height);
 int	is_outside(t_game *game, double x, double y)
 {
 	int	map_x;
@@ -44,48 +28,24 @@ int	is_outside(t_game *game, double x, double y)
 	return (0);
 }
 
-// void	update_position(t_game *game, double move_x, double move_y)
-// {
-// 	double	new_x;
-// 	double	new_y;
-
-// 	new_x = game->player.x + move_x;
-// 	new_y = game->player.y + move_y;
-// 	if (!is_outside(game, new_x, new_y))
-// 	{
-// 		game->player.x = new_x;
-// 		game->player.y = new_y;
-// 	}
-// 	else
-// 	{
-// 		if (!is_outside(game, new_x, game->player.y))
-// 			game->player.x = new_x;
-// 		if (!is_outside(game, game->player.x, new_y))
-// 			game->player.y = new_y;
-// 	}
-// 	printf("New position x : %f\n", game->player.x);
-// 	printf("New position y : %f\n", game->player.y);
-// }
-
-
-void update_position(t_game *game, double move_x, double move_y)
+void	update_position(t_game *game, double move_x, double move_y)
 {
-    double new_x = game->player.x + move_x;
-    double new_y = game->player.y + move_y;
+	double	new_x;
+	double	new_y;
 
-    // Check for wall collisions and update player position accordingly
-    if (!is_wall(game, new_x, game->player.y))
-    {
-        game->player.x = new_x;
-    }
-    if (!is_wall(game, game->player.x, new_y))
-    {
-        game->player.y = new_y;
-    }
-
-	printf("Updated Player Position: x = %f, y = %f\n", game->player.x, game->player.y);
+	new_x = game->player.x + move_x;
+	new_y = game->player.y + move_y;
+	if (!is_wall(game, new_x, game->player.y))
+	{
+		game->player.x = new_x;
+	}
+	if (!is_wall(game, game->player.x, new_y))
+	{
+		game->player.y = new_y;
+	}
+	printf("Updated Player Position: x = %f, y = %f\n",
+		game->player.x, game->player.y);
 }
-
 
 // void	rotate_player(t_game *game, double angle)
 // {
@@ -111,64 +71,54 @@ void update_position(t_game *game, double move_x, double move_y)
 // 	// printf("plane_y : %f\n", game->player.plane_y);
 // }
 
-void rotate_player(t_game *game, double angle)
+void	rotate_player(t_game *game, double angle)
 {
+	double	old_dir_x;
+	double	old_plane_x;
+
+	old_dir_x = game->player.dir_x;
+	old_plane_x = game->player.plane_x;
 	game->skip_mouse_event = 1;
-    double old_dir_x = game->player.dir_x;
-    double old_plane_x = game->player.plane_x;
-
-    // Apply rotation using cosine and sine for smooth rotation
-    game->player.dir_x = old_dir_x * cos(angle) - game->player.dir_y * sin(angle);
-    game->player.dir_y = old_dir_x * sin(angle) + game->player.dir_y * cos(angle);
-
-    game->player.plane_x = old_plane_x * cos(angle) - game->player.plane_y * sin(angle);
-    game->player.plane_y = old_plane_x * sin(angle) + game->player.plane_y * cos(angle);
-
+	game->player.dir_x = old_dir_x * cos(angle)
+		- game->player.dir_y * sin(angle);
+	game->player.dir_y = old_dir_x * sin(angle)
+		+ game->player.dir_y * cos(angle);
+	game->player.plane_x = old_plane_x * cos(angle)
+		- game->player.plane_y * sin(angle);
+	game->player.plane_y = old_plane_x * sin(angle)
+		+ game->player.plane_y * cos(angle);
 	//TODO fix
-	//mlx_mouse_move(game->mlx, game->win, game->win_width / 2, game->win_height / 2);
+	mlx_mouse_move(game->mlx, game->win, game->win_width / 2,
+		game->win_height / 2);
 	game->skip_mouse_event = 0;
 }
 
-// void    display_mini_map(t_game *game, t_texture *frame)
-// {
-//     t_texture mini_map;
-
-//     (void)frame;
-//     mini_map.width = M_SIZE * T_SIZE;
-//     mini_map.height = M_SIZE * T_SIZE;
-//     mini_map.img = mlx_new_image(game->mlx, mini_map.width, mini_map.height);
-//     mini_map.addr = mlx_get_data_addr(mini_map.img, &mini_map.pixel_bits, &mini_map.size_line, &mini_map.endian);
-//     draw_mini_map(game, &mini_map);
-//     draw_player(game, &mini_map);
-//     mlx_put_image_to_window(game->mlx, game->win, mini_map.img, 10, 10); // Positionne la mini-map
-//     mlx_destroy_image(game->mlx, mini_map.img);
-// }
-
-void draw_center_circle(t_game *game, int radius)
+void	draw_center_circle(t_game *game, int radius)
 {
-	int center_x;
-	int center_y;
-	int pixel_x;
-	int pixel_y;
-	int x;
-	int y;
+	int	center_x;
+	int	center_y;
+	int	pixel_x;
+	int	pixel_y;
+	int	x;
+	int	y;
 
 	center_y = game->win_height / 2;
 	center_x = game->win_width / 2;
 	y = -radius - 1;
 	while (++y <= radius)
 	{
-		x = -radius;
-		while (x <= radius)
+		x = -radius - 1;
+		while (++x <= radius)
 		{
-			if ((x * x + y * y) <= (radius * radius)) // Vérifie si le pixel est dans le cercle
+			if ((x * x + y * y) <= (radius * radius))
 			{
 				pixel_x = center_x + x;
 				pixel_y = center_y + y;
-				if (pixel_x >= 0 && pixel_x < game->win_width && pixel_y >= 0 && pixel_y < game->win_height)
-					mlx_pixel_put(game->mlx, game->win, pixel_x, pixel_y, 0x000000);
+				if (pixel_x >= 0 && pixel_x < game->win_width && pixel_y >= 0
+					&& pixel_y < game->win_height)
+					mlx_pixel_put(game->mlx, game->win, pixel_x,
+						pixel_y, 0x000000);
 			}
-			x++;
 		}
 	}
 }
@@ -176,87 +126,88 @@ void draw_center_circle(t_game *game, int radius)
 // Cooldown time after teleport (in frames or ticks)
 #define TELEPORT_COOLDOWN 50
 
-void check_portal_teleport(t_game *game) {
-    static int teleport_cooldown = 0;
+void	check_portal_teleport(t_game *game)
+{
+	static int teleport_cooldown = 0;
 
-    // Decrease the cooldown counter if active
-    if (teleport_cooldown > 0) {
-        teleport_cooldown--;
-        return;  // No teleportation while in cooldown
-    }
+	// Decrease the cooldown counter if active
+	if (teleport_cooldown > 0) {
+		teleport_cooldown--;
+		return;  // No teleportation while in cooldown
+	}
 
-    int portal_index = -1;
+	int portal_index = -1;
 
-    // Check if the player is near a portal's side
-    if (game->map.map[(int)game->player.y][(int)game->player.x] == '2') {
-        if (fabs(game->player.x - game->portals[0].x) < 0.5 && fabs(game->player.y - game->portals[0].y) < 0.5) {
-            portal_index = 0;
-        }
-    } else if (game->map.map[(int)game->player.y][(int)game->player.x] == '3') {
-        if (fabs(game->player.x - game->portals[1].x) < 0.5 && fabs(game->player.y - game->portals[1].y) < 0.5) {
-            portal_index = 1;
-        }
-    }
+	// Check if the player is near a portal's side
+	if (game->map.map[(int)game->player.y][(int)game->player.x] == '2') {
+		if (fabs(game->player.x - game->portals[0].x) < 0.5 && fabs(game->player.y - game->portals[0].y) < 0.5) {
+			portal_index = 0;
+		}
+	} else if (game->map.map[(int)game->player.y][(int)game->player.x] == '3') {
+		if (fabs(game->player.x - game->portals[1].x) < 0.5 && fabs(game->player.y - game->portals[1].y) < 0.5) {
+			portal_index = 1;
+		}
+	}
 
-    if (portal_index != -1 && game->portals[portal_index].link) {
-        int other_portal = (portal_index == 0) ? 1 : 0;
+	if (portal_index != -1 && game->portals[portal_index].link) {
+		int other_portal = (portal_index == 0) ? 1 : 0;
 
-        // Calculate direction offsets
-        double dx = 0.0;
-        double dy = 0.0;
-        if (game->portals[portal_index].direction == NORTH) dy = -0.5;
-        if (game->portals[portal_index].direction == SOUTH) dy = 0.5;
-        if (game->portals[portal_index].direction == EAST) dx = 0.5;
-        if (game->portals[portal_index].direction == WEST) dx = -0.5;
+		// Calculate direction offsets
+		double dx = 0.0;
+		double dy = 0.0;
+		if (game->portals[portal_index].direction == NORTH) dy = -0.5;
+		if (game->portals[portal_index].direction == SOUTH) dy = 0.5;
+		if (game->portals[portal_index].direction == EAST) dx = 0.5;
+		if (game->portals[portal_index].direction == WEST) dx = -0.5;
 
-        // Check if the player is close enough to the portal to teleport
-        if (fabs(game->player.x - (game->portals[portal_index].x + dx)) < 0.1 &&
-            fabs(game->player.y - (game->portals[portal_index].y + dy)) < 0.1) {
+		// Check if the player is close enough to the portal to teleport
+		if (fabs(game->player.x - (game->portals[portal_index].x + dx)) < 0.1 &&
+			fabs(game->player.y - (game->portals[portal_index].y + dy)) < 0.1) {
 
-            // Teleport the player to the other portal's location
-            game->player.x = game->portals[other_portal].x + 0.5;
-            game->player.y = game->portals[other_portal].y + 0.5;
+			// Teleport the player to the other portal's location
+			game->player.x = game->portals[other_portal].x + 0.5;
+			game->player.y = game->portals[other_portal].y + 0.5;
 
-            // Adjust player direction based on portal orientations
-            if (game->portals[portal_index].direction == game->portals[other_portal].direction) {
-                // Same direction, no change needed
-            } else if (abs(game->portals[portal_index].direction - game->portals[other_portal].direction) == 2) {
-                // Opposite directions, rotate 180 degrees
-                game->player.dir_x = -game->player.dir_x;
-                game->player.dir_y = -game->player.dir_y;
-            } else {
-                // Rotate 90 degrees based on the direction difference
-                double old_dir_x = game->player.dir_x;
-                if ((game->portals[portal_index].direction == NORTH && game->portals[other_portal].direction == EAST) ||
-                    (game->portals[portal_index].direction == EAST && game->portals[other_portal].direction == SOUTH) ||
-                    (game->portals[portal_index].direction == SOUTH && game->portals[other_portal].direction == WEST) ||
-                    (game->portals[portal_index].direction == WEST && game->portals[other_portal].direction == NORTH)) {
-                    game->player.dir_x = -game->player.dir_y;
-                    game->player.dir_y = old_dir_x;
-                } else {
-                    game->player.dir_x = game->player.dir_y;
-                    game->player.dir_y = -old_dir_x;
-                }
-            }
+			// Adjust player direction based on portal orientations
+			if (game->portals[portal_index].direction == game->portals[other_portal].direction) {
+				// Same direction, no change needed
+			} else if (abs(game->portals[portal_index].direction - game->portals[other_portal].direction) == 2) {
+				// Opposite directions, rotate 180 degrees
+				game->player.dir_x = -game->player.dir_x;
+				game->player.dir_y = -game->player.dir_y;
+			} else {
+				// Rotate 90 degrees based on the direction difference
+				double old_dir_x = game->player.dir_x;
+				if ((game->portals[portal_index].direction == NORTH && game->portals[other_portal].direction == EAST) ||
+					(game->portals[portal_index].direction == EAST && game->portals[other_portal].direction == SOUTH) ||
+					(game->portals[portal_index].direction == SOUTH && game->portals[other_portal].direction == WEST) ||
+					(game->portals[portal_index].direction == WEST && game->portals[other_portal].direction == NORTH)) {
+					game->player.dir_x = -game->player.dir_y;
+					game->player.dir_y = old_dir_x;
+				} else {
+					game->player.dir_x = game->player.dir_y;
+					game->player.dir_y = -old_dir_x;
+				}
+			}
 
-            // Set a small teleport offset to avoid stepping back into the portal
-            game->player.x += game->player.dir_x * 0.2;
-            game->player.y += game->player.dir_y * 0.2;
+			// Set a small teleport offset to avoid stepping back into the portal
+			game->player.x += game->player.dir_x * 0.2;
+			game->player.y += game->player.dir_y * 0.2;
 
-            // Activate the teleport cooldown
-            teleport_cooldown = TELEPORT_COOLDOWN;
+			// Activate the teleport cooldown
+			teleport_cooldown = TELEPORT_COOLDOWN;
 
-            // Debug: Print player position and direction after teleport
-            printf("Teleported to Portal %d. New Position: x = %.2f, y = %.2f. Direction: dir_x = %.2f, dir_y = %.2f\n",
-                   other_portal, game->player.x, game->player.y, game->player.dir_x, game->player.dir_y);
-        }
-    }
+			// Debug: Print player position and direction after teleport
+			printf("Teleported to Portal %d. New Position: x = %.2f, y = %.2f. Direction: dir_x = %.2f, dir_y = %.2f\n",
+				   other_portal, game->player.x, game->player.y, game->player.dir_x, game->player.dir_y);
+		}
+	}
 }
 
-int display_each_frame(t_game *game)
+int	display_each_frame(t_game *game)
 {
-	// Clear the frame
-	t_texture frame;
+	t_texture	frame;
+
 	frame.width = game->win_width;
 	frame.height = game->win_height;
 	frame.img = mlx_new_image(game->mlx, frame.width, frame.height);
@@ -278,10 +229,5 @@ int display_each_frame(t_game *game)
 	is_action(game);
 	check_portal_teleport(game);
 	display_portal_gun(game);  // Handle gun display
-	return 0;
+	return (0);
 }
-
-
-
-
-

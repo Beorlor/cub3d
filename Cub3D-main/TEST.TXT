@@ -1,48 +1,47 @@
 -------------------------------------------------- FILE ----------------------------------------------
 - Manque un espace entre les textures ou rgb et leur valeur => OK
-- Manque un espace entre le groupe rgb et textures => KO : TO FIX
-- Manque une ligne vide entre les couleurs et la map => KO : TO FIX
-- Quelque chose (autre que vide) apres la map => OK
+- Manque un espace entre le groupe rgb et textures => KO
+- Manque une ligne vide entre les couleurs et la map => 
+- Quelque chose (autre que vide) apres la map => 
 - Not .cub file => OK
-- Not an xpm file => TO TEST WITH A VALID IMAGE !
+- Not an xpm file => OK
 - Couleurs rgb sol invalides
 - Couleurs rgb plafond invalides
-- Une couleur rgb manque => OK
+- Une couleur rgb manque => DONE
     - Invalid plafond color => Double error message > Check what we keep !
-- Valeur RGB invalide (min: 0, max: 255) => OK
-    - Invalid sol color => OK
+- Valeur RGB invalide (min: 0, max: 255) => DONE
+    - Invalid sol color => DONE
 - Textures manquantes => OK
 - Textures paths invalides (path + directory)
       - OK but need to test with a real image !
-- Couleur manquante plafond => OK
-- Couleur manquante sol => OK
+- Couleur manquante plafond => DONE
+- Couleur manquante sol => DONE
 - RGB double => OK
+- Texture doublon => OK (LEAKS)
 - Manque virgule RGB colors => OK
-- Manque espace entre ID et path texture => OK
+- Manque espace entre ID et path texture => 
 - Pas de couleurs => OK
 - File vide => OK
-- Map n'est pas le dernier element de la map => OK
+- Map n'est pas le dernier element de la map => KO
 - Pas de type file => OK
 - Textures en double 
-    => OK if same texture ID (NO / SO / etc.)
-    => OK > Map description error
+    => OK (textures_duplicate) but leaks !
 
 -------------------------------------------------- MAP ----------------------------------------------
-- Map interdite
-    - Player coincé => OSEF
 - Map en premier => OK
-- Map au milieu => OK
+- Map au milieu => OK (BUT char error ??)
 - Pas de map => OK
 - Juste la map => OK
 - Plusieurs maps => OK
-- Map trop petite => OK but position player error
-- Plusieurs players => OK
-- Pas de player => OK
-- Player dans le mur (invalid position) => OK but floodfill error (walls)
-- Trou dans le mur est => OK
-- Trou dans le mur nord => OK
-- Trou dans le mur sud => OK
-- Trou dans le mur ouest => OK
-- Trou dans le mur diagonale => OK
+- Map trop petite => OK (player error valid)
+- Plusieurs players => OK (LEAKS : Invalid read of size 1 is_char_valid)
+- Pas de player => OK (LEAKS : same)
+- Player dans le mur (invalid position) => OK
+- Trou dans le mur est => OK (leak)
+- Trou dans le mur nord => OK (leak)
+- Trou dans le mur sud => OK (leak)
+- Trou dans le mur ouest => OK (leak)
+- Pas de mur => OK
+- Trou dans le mur diagonale => 
 - Char interdit dans la map => OK
 - Map \n => OK

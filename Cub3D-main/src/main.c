@@ -34,8 +34,6 @@ void	create_textures(t_game *game)
 	}
 }
 
-// TO ADD : mlx_mouse_hook(data.window, handle_mouse, &data);
-// Handle mouse events (left click to select)
 void	create_window(t_game *game)
 {
 	if (game->mlx == NULL)
@@ -83,11 +81,11 @@ int	main(int argc, char *argv[])
 	malloc_map(&game);
 	fill_map(&game, map);
 	manage_errors(&game, map);
+	free(map);
 	create_textures(&game);
 	load_portal_textures(&game);
 	create_window(&game);
 	mlx_loop(game.mlx);
-	free(map);
 	free_all2(&game);
 	return (0);
 }
