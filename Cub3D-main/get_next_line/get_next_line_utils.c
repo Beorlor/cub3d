@@ -3,115 +3,96 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/06 10:35:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/06/06 10:37:49 by jeguerin         ###   ########.fr       */
+/*   Created: 2023/10/11 14:36:09 by jedurand          #+#    #+#             */
+/*   Updated: 2024/09/05 01:08:54 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../Libft/libft.h"
 #include "get_next_line.h"
 
-int	ft_strlen_gnl(char *str)
+/* Looks for a newline character in the given linked list. */
+
+int	found_newline(t_ist *stash)
 {
-	int	i;
+	int		i;
+	t_ist	*last;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-int	ft_strchr_gnl(const char *str, int c)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
+	if (stash == NULL)
 		return (0);
-	while (str[i])
+	last = ft_lst_get_last(stash);
+	i = 0;
+	while (last->content[i])
 	{
-		if (str[i] == (unsigned char)c)
+		if (last->content[i] == '\n')
 			return (1);
 		i++;
 	}
-	if (str[i] == '\0')
-		return (0);
-	return (-1);
+	return (0);
 }
 
-char	*ft_strndup_gnl(const char *str, int size)
+/* Returns a pointer to the last node in our stash */
+
+t_ist	*ft_lst_get_last(t_ist *stash)
 {
-	char	*dest;
-	int		i;
+	t_ist	*current;
 
-	i = 0;
-	if (!str || size == 0)
-		return (NULL);
-	dest = (char *)malloc(sizeof(char) * (size + 1));
-	if (dest == NULL)
-		return (NULL);
-	while (i < size)
-	{
-		dest[i] = str[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
+	current = stash;
+	if (current == NULL)
+		return (current);
+	while (current->next)
+		current = current->next;
+	return (current);
 }
 
-char	*ft_join(char *s1, char *s2)
+/* Calculates the number of chars in the current line, including the trailing
+ * \n if there is one, and allocates memory accordingly. */
+
+void	generate_line(char **line, t_ist *stash)
 {
-	char	*dest;
-	int		i;
-	int		j;
-	size_t	lens;
+	int	i;
+	int	len;
 
-	i = 0;
-	j = 0;
-	lens = ft_strlen_gnl(s2);
-	if (!s1)
-		return (ft_strndup_gnl(s2, lens));
-	lens = lens + ft_strlen_gnl(s1);
-	dest = (char *)malloc(sizeof(char) * (lens + 1));
-	if (dest == NULL)
-		return (NULL);
-	while (s1[i])
+	len = 0;
+	while (stash)
 	{
-		dest[i] = s1[i];
-		i++;
+		i = 0;
+		while (stash->content[i] && stash->content[i] != '\n')
+		{
+			len++;
+			i++;
+		}
+		if (stash->content[i] == '\n')
+			len++;
+		stash = stash->next;
 	}
-	while (s2[j])
-		dest[i++] = s2[j++];
-	dest[i] = '\0';
-	free(s1);
-	return (dest);
+	*line = malloc(sizeof(char) * (len + 1));
 }
 
-/*
-fd = le descripteur de fichier a partir duquel on veut lire.
-Ref. qui pointe vers un fichier.
-buffer = un pointeur vers la zone de mem. ou les donnees lues seront stockees
-count = le nb maximum d'octets a lire.
-La fonction read essaie de lire count octets à partir du descripteur de
-fichier fd et stocke ces octets dans la zone de mémoire pointée par buf.
-*/
+/* Frees the entire stash. */
 
-/*
-Fonctions :
-- strchr : Check le caractere nul
-- Qui extrait de stash la ligne qu'on souhaite afficher
-pour l'afficher (extract_line)
-- Une fonction qui nettoie (MAJ)stash ? Update_stash
-- Join : Dans le cas ou on n'a pas de \n il faut copier la static et
-buffer dans une str,
-(car sera ecrasee quand on remettra le new buffer)
-Du coup, on va join que si on pas de \n dans la static et faudra clean une fois
-qu'on a trouve le \n.
-- Strndup : static = buffer_size
-Malloc le buffer dans get_next_line.
+void	free_stash(t_ist *stash)
+{
+	t_ist	*current;
+	t_ist	*next;
 
-Tu mets le buffer dans ta static, seulement s'il n'y a plus rien dedans.
-Tu joins uniquement lorsque tu ne trouves pas de /n.
-*/
+	current = stash;
+	while (current)
+	{
+		free(current->content);
+		next = current->next;
+		free(current);
+		current = next;
+	}
+}
+
+int	ft_strlen2(const char *str)
+{
+	int	len;
+
+	len = 0;
+	while (*(str++))
+		len++;
+	return (len);
+}

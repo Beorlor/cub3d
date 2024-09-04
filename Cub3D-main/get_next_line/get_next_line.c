@@ -3,102 +3,154 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/06 10:35:18 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 18:46:36 by jeguerin         ###   ########.fr       */
+/*   Created: 2023/10/11 14:35:46 by jedurand          #+#    #+#             */
+/*   Updated: 2024/09/05 01:19:08 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../Libft/libft.h"
 #include "get_next_line.h"
 
-char	*update_stash(char *stash)
-{
-	int		i;
-	char	*next_line;
-	int		len;
+/* After extracting the line that was read, we don't need those characters
+ * anymore. This function clears the stash so only the characters that have
+ * not been returned at the end of get_next_line remain in our static stash. */
 
-	next_line = 0;
-	if (!stash)
-		return (NULL);
+void	clean_stash(t_ist **stash)
+{
+	t_ist	*last;
+	t_ist	*clean_node;
+	int		i;
+	int		j;
+
+	clean_node = malloc(sizeof(t_ist));
+	if (stash == NULL || clean_node == NULL)
+		return ;
+	clean_node->next = NULL;
+	last = ft_lst_get_last(*stash);
 	i = 0;
-	while (stash[i] && stash[i] != '\n')
+	while (last->content[i] && last->content[i] != '\n')
 		i++;
-	if (stash[i] == '\n')
-	{
+	if (last->content && last->content[i] == '\n')
 		i++;
-		len = ft_strlen_gnl(stash + i);
-		next_line = ft_strndup_gnl(stash + i, len);
-	}
-	else
-		next_line = ft_strndup_gnl(stash + i, ft_strlen_gnl(stash + i));
-	free(stash);
-	return (next_line);
+	clean_node->content = malloc(sizeof(char)
+			* ((ft_strlen2(last->content) - i) + 1));
+	if (clean_node->content == NULL)
+		return ;
+	j = 0;
+	while (last->content[i])
+		clean_node->content[j++] = last->content[i++];
+	clean_node->content[j] = '\0';
+	free_stash(*stash);
+	*stash = clean_node;
 }
 
-char	*extract_line(char *stash)
-{
-	char	*line;
-	int		i;
+/* Extracts all characters from our stash and stores them in out line.
+ * stopping after the first \n it encounters */
 
-	i = 0;
-	if (!stash)
-		return (NULL);
-	if (ft_strchr_gnl(stash, '\n') == 1)
+void	extract_line(t_ist *stash, char **line)
+{
+	int	i;
+	int	j;
+
+	if (stash == NULL)
+		return ;
+	generate_line(line, stash);
+	if (*line == NULL)
+		return ;
+	j = 0;
+	while (stash)
 	{
-		while (stash[i] != '\n' && stash[i])
-			i++;
-		if (stash[i] == '\n')
-			i++;
+		i = 0;
+		while (stash->content[i])
+		{
+			if (stash->content[i] == '\n')
+			{
+				(*line)[j++] = stash->content[i];
+				break ;
+			}
+			(*line)[j++] = stash->content[i++];
+		}
+		stash = stash->next;
 	}
-	else
-		i = ft_strlen_gnl(stash);
-	line = ft_strndup_gnl(stash, i);
-	return (line);
+	(*line)[j] = '\0';
+}
+
+/* Adds the content of our buffer to the end of our stash */
+
+static void	add_to_stash(t_ist **stash, char *buff, int readed)
+{
+	int		i;
+	t_ist	*last;
+	t_ist	*new_node;
+
+	new_node = malloc(sizeof(t_ist));
+	if (new_node == NULL)
+		return ;
+	new_node->next = NULL;
+	new_node->content = malloc(sizeof(char) * (readed + 1));
+	if (new_node->content == NULL)
+		return ;
+	i = 0;
+	while (buff[i] && i < readed)
+	{
+		new_node->content[i] = buff[i];
+		i++;
+	}
+	new_node->content[i] = '\0';
+	if (*stash == NULL)
+	{
+		*stash = new_node;
+		return ;
+	}
+	last = ft_lst_get_last(*stash);
+	last->next = new_node;
+}
+
+/* Uses read() to add characters to the stash */
+
+void	read_and_stash(int fd, t_ist **stash)
+{
+	char	*buff;
+	int		readed;
+
+	readed = 1;
+	while (!found_newline(*stash) && readed != 0)
+	{
+		buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+		if (buff == NULL)
+			return ;
+		readed = (int)read(fd, buff, BUFFER_SIZE);
+		if ((*stash == NULL && readed == 0) || readed == -1)
+		{
+			free(buff);
+			return ;
+		}
+		buff[readed] = '\0';
+		add_to_stash(stash, buff, readed);
+		free(buff);
+	}
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
-	int			rd;
-	char		*buffer;
-	char		*line;
+	static t_ist	*stash;
+	char			*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) == -1)
 		return (free(stash), stash = NULL, NULL);
-	rd = 1;
-	buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buffer)
+	line = NULL;
+	read_and_stash(fd, &stash);
+	if (stash == NULL)
 		return (NULL);
-	while (rd != 0)
+	extract_line(stash, &line);
+	clean_stash(&stash);
+	if (line[0] == '\0')
 	{
-		rd = read(fd, buffer, BUFFER_SIZE);
-		buffer[rd] = '\0';
-		stash = ft_join(stash, buffer);
-		if (ft_strchr_gnl(stash, '\n') == 1)
-			break ;
+		free_stash(stash);
+		stash = NULL;
+		free(line);
+		return (NULL);
 	}
-	free(buffer);
-	line = extract_line(stash);
-	stash = update_stash(stash);
 	return (line);
 }
-
-// #include <fcntl.h>
-// #include <stdio.h>
-// int main()
-// {
-// 	int fd;
-// 	char *line;
-
-// 	fd = open("test.txt", O_RDONLY);
-// 	line = get_next_line(fd);
-// 	while (line)
-// 	{
-// 		printf("%s", line);
-// 		free(line);
-// 		line = get_next_line(fd);
-// 	}
-// 	return 0;
-// }

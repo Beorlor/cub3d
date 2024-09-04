@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   eof_error.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:45:33 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 19:06:26 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 01:26:40 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,35 +54,51 @@ int	is_map_ended(char *line, int fd, int map_ended)
 
 int	end_of_file_loop(int map_ended, int description, int fd)
 {
-	char	*line;
-	int		map_started;
+    char	*line;
+    int		map_started;
 
-	map_started = 0;
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		if (!map_started)
-		{
-			if (is_description_line(line))
-				description = 1;
-			else if (check_map_line(line))
-			{
-				map_started = is_end_of_file(map_started, description);
-				if (map_started == -1)
-				{
-					free(line);
-					return (1);
-				}
-			}
-		}
-		else
-			if (is_map_ended(line, fd, map_ended) == 1)
-				return (free(line), 1);
-		free (line);
-	}
-	return (0);
+    map_started = 0;
+    while (1)
+    {
+        line = get_next_line(fd);
+        if (line == NULL)
+            break;
+
+        if (!map_started)
+        {
+            if (is_description_line(line))
+                description = 1;
+            else if (check_map_line(line))
+            {
+                map_started = is_end_of_file(map_started, description);
+                if (map_started == -1)
+                {
+                    free(line);
+                    // Continue reading the file until the end before exiting
+                    while ((line = get_next_line(fd)) != NULL)
+                    {
+                        free(line); // Free each line read
+                    }
+                    return (1);  // Exit after reading till the end
+                }
+            }
+        }
+        else
+        {
+            if (is_map_ended(line, fd, map_ended) == 1)
+            {
+                free(line);
+                // Continue reading the file until the end before exiting
+                while ((line = get_next_line(fd)) != NULL)
+                {
+                    free(line); // Free each line read
+                }
+                return (1);  // Exit after reading till the end
+            }
+        }
+        free(line);
+    }
+    return (0);
 }
 
 int	is_there_something_after_map(const char *file, t_game *game)
