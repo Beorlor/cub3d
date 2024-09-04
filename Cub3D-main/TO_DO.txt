@@ -1,15 +1,17 @@
 Dans les trucs a faire :
 
-teleportation
+teleportation (seul truc chiant encore a faire)
 
-Noir autour du sprite du portal gun
+Noir autour du sprite du portal gun (ez)
 
-Remettre les rotations touches et souris
+Remettre les rotations touches et souris (ez)
 
-minimap pixel bleu et orange pour 2 et 3
+minimap pixel bleu et orange pour 2 et 3 (ez)
 
-mettre les bonnes textures
+mettre les bonnes textures (ez)
 
 leaks + norme
+
+pour la norme tout sauf gun_shot.c / graphic.c / is_wall / render_frame / check_portal_teleport
 
 full test a base de portail sur les portes, ect... tout les cas de merdes
