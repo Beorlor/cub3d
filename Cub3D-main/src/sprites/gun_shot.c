@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 02:06:18 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 02:32:23 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,27 +97,22 @@ void move_ball_towards_center(t_game *game, t_ball *ball)
     }
 }
 
-
-void place_portal(t_game *game, int portal_index, int map_x, int map_y, int direction) {
-    // Deactivate the previous portal if it exists
+// Deactivate the specified portal (blue or orange)
+void deactivate_portal(t_game *game, int portal_index) {
     if (game->portals[portal_index].active) {
-        game->map.map[(int)game->portals[portal_index].y][(int)game->portals[portal_index].x] = '1'; // Reset the previous position to wall
-    }
-
-    // Place the new portal
-    game->portals[portal_index].active = 1;
-    game->portals[portal_index].x = map_x;
-    game->portals[portal_index].y = map_y;
-    game->portals[portal_index].direction = direction;
-    game->map.map[map_y][map_x] = (portal_index == 0) ? '2' : '3'; // 2 for blue, 3 for orange
-
-    // Check if the two portals are now linked
-    if (game->portals[0].active && game->portals[1].active) {
-        game->portals[0].link = 1;
-        game->portals[1].link = 1;
+        game->map.map[(int)game->portals[portal_index].y][(int)game->portals[portal_index].x] = '1'; // Reset to wall
+        game->portals[portal_index].active = 0; // Deactivate the portal
+        game->portals[portal_index].link = 0; // Unlink the portal
     }
 }
 
+// Unlink both portals
+void unlink_portals(t_game *game) {
+    game->portals[0].link = 0;
+    game->portals[1].link = 0;
+}
+
+// Print portal information for debugging
 void print_portal_info(t_game *game) {
     printf("Blue Portal - x: %.2f, y: %.2f, direction: %d, active: %d\n",
            game->portals[0].x, game->portals[0].y, game->portals[0].direction, game->portals[0].active);
@@ -125,6 +120,64 @@ void print_portal_info(t_game *game) {
            game->portals[1].x, game->portals[1].y, game->portals[1].direction, game->portals[1].active);
 }
 
+// Function to place a portal
+void place_portal(t_game *game, int portal_index, int map_x, int map_y, int direction) {
+    //int other_portal_index = (portal_index == 0) ? 1 : 0;
+
+    // Handle blue portal ('2') interaction
+    if (portal_index == 0) {
+        if (game->map.map[map_y][map_x] == '3') {  // Blue hits orange
+            deactivate_portal(game, 0);  // Remove old blue portal
+            deactivate_portal(game, 1);  // Remove old orange portal
+            unlink_portals(game);  // Unlink both portals
+        } else if (game->map.map[map_y][map_x] == '2') {  // Blue hits blue
+            game->portals[0].direction = direction;  // Update direction
+            return;
+        } else if (game->map.map[map_y][map_x] == '1') {  // Blue hits wall
+            deactivate_portal(game, 0);  // Remove old blue portal
+        }
+
+        // Place the new blue portal
+        game->portals[0].active = 1;
+        game->portals[0].x = map_x;
+        game->portals[0].y = map_y;
+        game->portals[0].direction = direction;
+        game->map.map[map_y][map_x] = '2';  // Mark as blue portal block
+
+    // Handle orange portal ('3') interaction
+    } else if (portal_index == 1) {
+        if (game->map.map[map_y][map_x] == '2') {  // Orange hits blue
+            deactivate_portal(game, 0);  // Remove old blue portal
+            deactivate_portal(game, 1);  // Remove old orange portal
+            unlink_portals(game);  // Unlink both portals
+        } else if (game->map.map[map_y][map_x] == '3') {  // Orange hits orange
+            game->portals[1].direction = direction;  // Update direction
+            return;
+        } else if (game->map.map[map_y][map_x] == '1') {  // Orange hits wall
+            deactivate_portal(game, 1);  // Remove old orange portal
+        }
+
+        // Place the new orange portal
+        game->portals[1].active = 1;
+        game->portals[1].x = map_x;
+        game->portals[1].y = map_y;
+        game->portals[1].direction = direction;
+        game->map.map[map_y][map_x] = '3';  // Mark as orange portal block
+    }
+
+    // Check if the two portals are now linked
+    if (game->portals[0].active && game->portals[1].active) {
+        game->portals[0].link = 1;
+        game->portals[1].link = 1;
+    } else {
+        unlink_portals(game); // Unlink if one portal is deactivated
+    }
+
+    // Debug: Print portal values after placing a portal
+    print_portal_info(game);
+}
+
+// Move the ball towards the wall and place a portal
 void move_ball_towards_wall(t_game *game, t_ball *ball) {
     double next_x = ball->x + ball->direction_x * ball->speed;
     double next_y = ball->y + ball->direction_y * ball->speed;
@@ -170,32 +223,21 @@ void move_ball_towards_wall(t_game *game, t_ball *ball) {
             side = 1; // Vertical side (North-South)
         }
 
-        // Check if the ball hits a wall (1), portal (2 or 3)
+        // Check if the ball hits a wall (1), blue portal (2), or orange portal (3)
         if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
             game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
 
             // Determine the direction of the hit side
             if (side == 0) {
-                if (step_x > 0) {
-                    direction = EAST; // Ball moving right, hit east
-                } else {
-                    direction = WEST; // Ball moving left, hit west
-                }
+                direction = (step_x > 0) ? EAST : WEST; // Ball hit East or West side
             } else {
-                if (step_y > 0) {
-                    direction = SOUTH; // Ball moving down, hit south
-                } else {
-                    direction = NORTH; // Ball moving up, hit north
-                }
+                direction = (step_y > 0) ? SOUTH : NORTH; // Ball hit North or South side
             }
 
             // Place the portal on the correct wall side
             int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
             place_portal(game, portal_index, map_x, map_y, direction);
             ball->active = 0; // Deactivate the ball after placing the portal
-
-            // Debug: Print portal values after placing a portal
-            print_portal_info(game);
 
             return;
         }
@@ -208,6 +250,7 @@ void move_ball_towards_wall(t_game *game, t_ball *ball) {
     // Shrink the ball as it moves
     ball->size = fmax(5, ball->size - 4);
 }
+
 // Update the state of the balls
 void	update_balls(t_game *game)
 {

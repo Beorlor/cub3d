@@ -1,13 +1,15 @@
 Dans les trucs a faire :
 
-Noir autour du sprite
+teleportation
 
-Remettre les rotations touches
+Noir autour du sprite du portal gun
 
+Remettre les rotations touches et souris
 
-Norme
+minimap pixel bleu et orange pour 2 et 3
 
-Portail
+mettre les bonnes textures
 
+leaks + norme
 
-bug balls can pass throug door
+full test a base de portail sur les portes, ect... tout les cas de merdes
