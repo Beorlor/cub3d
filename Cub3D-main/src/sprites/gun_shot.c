@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 01:53:21 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/04 02:06:18 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,13 @@ void place_portal(t_game *game, int portal_index, int map_x, int map_y, int dire
     }
 }
 
+void print_portal_info(t_game *game) {
+    printf("Blue Portal - x: %.2f, y: %.2f, direction: %d, active: %d\n",
+           game->portals[0].x, game->portals[0].y, game->portals[0].direction, game->portals[0].active);
+    printf("Orange Portal - x: %.2f, y: %.2f, direction: %d, active: %d\n",
+           game->portals[1].x, game->portals[1].y, game->portals[1].direction, game->portals[1].active);
+}
+
 void move_ball_towards_wall(t_game *game, t_ball *ball) {
     double next_x = ball->x + ball->direction_x * ball->speed;
     double next_y = ball->y + ball->direction_y * ball->speed;
@@ -125,29 +132,73 @@ void move_ball_towards_wall(t_game *game, t_ball *ball) {
     int map_y = (int)next_y;
 
     int direction;
+    int side; // Track which side the ball hit
 
-    // Determine the direction the portal is facing based on the ball's movement
-    if (fabs(ball->direction_x) > fabs(ball->direction_y)) {
-        if (ball->direction_x > 0) {
-            direction = EAST;
-        } else {
-            direction = WEST;
-        }
+    // DDA setup: calculate distances between current and next grid intersections
+    double delta_dist_x = fabs(1 / ball->direction_x);
+    double delta_dist_y = fabs(1 / ball->direction_y);
+
+    int step_x, step_y;
+    double side_dist_x, side_dist_y;
+
+    // Calculate step direction and initial side_dist
+    if (ball->direction_x < 0) {
+        step_x = -1;
+        side_dist_x = (ball->x - map_x) * delta_dist_x;
     } else {
-        if (ball->direction_y > 0) {
-            direction = SOUTH;
-        } else {
-            direction = NORTH;
-        }
+        step_x = 1;
+        side_dist_x = (map_x + 1.0 - ball->x) * delta_dist_x;
     }
 
-    // Check if the ball hits a wall or portal
-    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
-        game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
-        int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
-        place_portal(game, portal_index, map_x, map_y, direction);
-        ball->active = 0; // Deactivate the ball after placing the portal
-        return;
+    if (ball->direction_y < 0) {
+        step_y = -1;
+        side_dist_y = (ball->y - map_y) * delta_dist_y;
+    } else {
+        step_y = 1;
+        side_dist_y = (map_y + 1.0 - ball->y) * delta_dist_y;
+    }
+
+    // Perform DDA to find the side of the wall the ball hit
+    while (1) {
+        if (side_dist_x < side_dist_y) {
+            side_dist_x += delta_dist_x;
+            map_x += step_x;
+            side = 0; // Horizontal side (East-West)
+        } else {
+            side_dist_y += delta_dist_y;
+            map_y += step_y;
+            side = 1; // Vertical side (North-South)
+        }
+
+        // Check if the ball hits a wall (1), portal (2 or 3)
+        if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
+            game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+
+            // Determine the direction of the hit side
+            if (side == 0) {
+                if (step_x > 0) {
+                    direction = EAST; // Ball moving right, hit east
+                } else {
+                    direction = WEST; // Ball moving left, hit west
+                }
+            } else {
+                if (step_y > 0) {
+                    direction = SOUTH; // Ball moving down, hit south
+                } else {
+                    direction = NORTH; // Ball moving up, hit north
+                }
+            }
+
+            // Place the portal on the correct wall side
+            int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
+            place_portal(game, portal_index, map_x, map_y, direction);
+            ball->active = 0; // Deactivate the ball after placing the portal
+
+            // Debug: Print portal values after placing a portal
+            print_portal_info(game);
+
+            return;
+        }
     }
 
     // Update ball position on the map
@@ -157,8 +208,6 @@ void move_ball_towards_wall(t_game *game, t_ball *ball) {
     // Shrink the ball as it moves
     ball->size = fmax(5, ball->size - 4);
 }
-
-
 // Update the state of the balls
 void	update_balls(t_game *game)
 {

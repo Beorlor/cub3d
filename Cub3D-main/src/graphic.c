@@ -106,12 +106,15 @@ void render_scene(t_game *game, t_texture *frame) {
             texture = (step_y > 0) ? &game->textures[SOUTH] : &game->textures[NORTH];
         }
 
+        // Adjust portal overlay based on which side was hit and portal's direction
         if (game->map.map[map_y][map_x] == '2') {
-            if (side == game->portals[0].direction) {
+            if ((side == 0 && game->portals[0].direction == (step_x > 0 ? EAST : WEST)) ||
+                (side == 1 && game->portals[0].direction == (step_y > 0 ? SOUTH : NORTH))) {
                 overlay_texture = &game->portals[0].texture;  // Use blue portal texture
             }
         } else if (game->map.map[map_y][map_x] == '3') {
-            if (side == game->portals[1].direction) {
+            if ((side == 0 && game->portals[1].direction == (step_x > 0 ? EAST : WEST)) ||
+                (side == 1 && game->portals[1].direction == (step_y > 0 ? SOUTH : NORTH))) {
                 overlay_texture = &game->portals[1].texture;  // Use orange portal texture
             }
         }
