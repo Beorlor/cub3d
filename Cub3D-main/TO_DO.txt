@@ -3,7 +3,10 @@ Dans les trucs a faire :
 Noir autour du sprite du portal gun (ez)
 
 minimap pixel bleu et orange pour 2 et 3 (ez)
- 
+
+revoir logique is_player_next_to_door
+check delay dans la tp
+
 leaks + norme => ALMOST DONE
 
 pour la norme tout sauf gun_shot.c / graphic.c / is_wall / render_frame / check_portal_teleport
