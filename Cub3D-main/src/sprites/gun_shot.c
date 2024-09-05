@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gun_shot.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 14:41:16 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 02:27:03 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,10 @@ void	unlink_portals(t_game *game) {
 
 // Print portal information for debugging
 void	print_portal_info(t_game *game) {
-	printf("Blue Portal - x: %.2f, y: %.2f, direction: %d, active: %d\n",
-		   game->portals[0].x, game->portals[0].y, game->portals[0].direction, game->portals[0].active);
-	printf("Orange Portal - x: %.2f, y: %.2f, direction: %d, active: %d\n",
-		   game->portals[1].x, game->portals[1].y, game->portals[1].direction, game->portals[1].active);
+	printf("Blue Portal - x: %.2f, y: %.2f, direction: %d, active: %d, link: %d\n",
+		   game->portals[0].x, game->portals[0].y, game->portals[0].direction, game->portals[0].active, game->portals[0].link);
+	printf("Orange Portal - x: %.2f, y: %.2f, direction: %d, active: %d, link: %d\n",
+		   game->portals[1].x, game->portals[1].y, game->portals[1].direction, game->portals[1].active, game->portals[1].link);
 }
 
 // Function to place a portal
@@ -264,10 +264,6 @@ void	update_balls(t_game *game)
 				move_ball_towards_center(game, &game->ball[i]);
 			else if (game->ball[i].stage == 2)
 				move_ball_towards_wall(game, &game->ball[i]);
-
-			// Print ball position and size
-			printf("Ball Position: x=%.2f, y=%.2f, wx=%.2f, wy=%.2f, size=%d\n",
-				game->ball[i].x, game->ball[i].y, game->ball[i].wx, game->ball[i].wy, game->ball[i].size);
 		}
 		i++;
 	}
