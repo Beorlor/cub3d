@@ -50,17 +50,6 @@
 # define MINIMAP_WIDTH 100
 # define MINIMAP_HEIGHT 100
 
-// #define KEY_ESC     65307  // Échap (Escape)
-// #define KEY_UP      65362  // Flèche haut
-// #define KEY_DOWN    65364  // Flèche bas
-// #define KEY_W       119    // W
-// #define KEY_A       97     // A
-// #define KEY_S       115    // S
-// #define KEY_D       100    // D
-// #define KEY_LEFT    65361  // Flèche gauche
-// #define KEY_RIGHT   65363  // Flèche droite
-// #define SZ          32     // Espace (Space)
-
 # define MOUSE_LEFT_CLICK 1
 
 typedef enum s_texture_index
@@ -141,8 +130,6 @@ typedef struct s_portal
 	int			direction;
 	int			link;
 }	t_portal;
-// Direction of the portal (NORTH, SOUTH, EAST, WEST)
-// Boolean, 0 if not linked, 1 if linked
 
 typedef struct s_player
 {
@@ -156,118 +143,118 @@ typedef struct s_player
 	double	rot_speed;
 }	t_player;
 
-typedef struct s_render_vars {
-    int ceiling_color;
-    int floor_color;
-    double camera_x;
-    double ray_dir_x;
-    double ray_dir_y;
-    int map_x;
-    int map_y;
-    double delta_dist_x;
-    double delta_dist_y;
-    int step_x;
-    int step_y;
-    double side_dist_x;
-    double side_dist_y;
-    int hit;
-    int side;
-    double perp_wall_dist;
-    int line_height;
-    int draw_start;
-    int draw_end;
-    double wall_x;
-    int tex_x;
-    int tex_y;
-    t_texture *texture;
-    t_texture *overlay_texture;
-    int x;
-    int y;
-    int walk_offset;
-    int mid_height;
-    int color;
-    int overlay_tex_x;
-    int overlay_tex_y;
-    int overlay_color;
-} t_render_vars;
+typedef struct s_render_vars
+{
+	int			ceiling_color;
+	int			floor_color;
+	double		camera_x;
+	double		ray_dir_x;
+	double		ray_dir_y;
+	int			map_x;
+	int			map_y;
+	double		delta_dist_x;
+	double		delta_dist_y;
+	int			step_x;
+	int			step_y;
+	double		side_dist_x;
+	double		side_dist_y;
+	int			hit;
+	int			side;
+	double		perp_wall_dist;
+	int			line_height;
+	int			draw_start;
+	int			draw_end;
+	double		wall_x;
+	int			tex_x;
+	int			tex_y;
+	t_texture	*texture;
+	t_texture	*overlay_texture;
+	int			x;
+	int			y;
+	int			walk_offset;
+	int			mid_height;
+	int			color;
+	int			overlay_tex_x;
+	int			overlay_tex_y;
+	int			overlay_color;
+}	t_render_vars;
 
-typedef struct s_gun_vars {
-	double x;
-	double y;
-    double center_x;
-    double center_y;
-    double dx;
-    double dy;
-    double distance;
-    double next_x;
-    double next_y;
-    int map_x;
-    int map_y;
-    int direction;
-    int side;
-    double delta_dist_x;
-    double delta_dist_y;
-    int step_x;
-    int step_y;
-    double side_dist_x;
-    double side_dist_y;
-    int portal_index;
-    int tex_width;
-    int tex_height;
-    double scale_x;
-    double scale_y;
-    int start_x;
-    int start_y;
-    int tex_x;
-    int tex_y;
-    int color;
-    int screen_x;
-    int screen_y;
-	int current_portal_index;
-    int current_map_x;
-    int current_map_y;
-    int current_direction;
-} t_gun_vars;
+typedef struct s_gun_vars
+{
+	double	x;
+	double	y;
+	double	center_x;
+	double	center_y;
+	double	dx;
+	double	dy;
+	double	distance;
+	double	next_x;
+	double	next_y;
+	int		map_x;
+	int		map_y;
+	int		direction;
+	int		side;
+	double	delta_dist_x;
+	double	delta_dist_y;
+	int		step_x;
+	int		step_y;
+	double	side_dist_x;
+	double	side_dist_y;
+	int		portal_index;
+	int		tex_width;
+	int		tex_height;
+	double	scale_x;
+	double	scale_y;
+	int		start_x;
+	int		start_y;
+	int		tex_x;
+	int		tex_y;
+	int		color;
+	int		screen_x;
+	int		screen_y;
+	int		current_portal_index;
+	int		current_map_x;
+	int		current_map_y;
+	int		current_direction;
+}	t_gun_vars;
 
-typedef struct s_map_processing {
-    int map_ended;
-    int description;
-    int map_started;
-} t_map_processing;
+typedef struct s_map_processing
+{
+	int	map_ended;
+	int	description;
+	int	map_started;
+}	t_map_processing;
 
 typedef struct s_game
 {
-	void		*mlx;
-	void		*win;
-	int			win_height;
-	int			win_width;
-	t_map		map;
-	t_player	player;
-	t_texture	textures[4];
-	t_color		floor;
-	t_color		ceiling;
-	t_input		input;
-	t_texture	mini_map;
-	t_texture	portal_gun;
-	t_ball		ball[2];
-	int			orientation;
-	int			gun_shot;
-	int			shot_frame;
-	char		*texture_paths[4];
-	int			running;
-	int			touch_state[6];
-	int			walk_offset;
-	int			frame_count;
-	t_portal	portals[2];
-	int			skip_mouse_event;
-	t_render_vars render_vars;
-	t_gun_vars gun_vars;
-	t_map_processing mprocess;
-	int teleport_cooldown;
+	void				*mlx;
+	void				*win;
+	int					win_height;
+	int					win_width;
+	t_map				map;
+	t_player			player;
+	t_texture			textures[4];
+	t_color				floor;
+	t_color				ceiling;
+	t_input				input;
+	t_texture			mini_map;
+	t_texture			portal_gun;
+	t_ball				ball[2];
+	int					orientation;
+	int					gun_shot;
+	int					shot_frame;
+	char				*texture_paths[4];
+	int					running;
+	int					touch_state[6];
+	int					walk_offset;
+	int					frame_count;
+	t_portal			portals[2];
+	int					skip_mouse_event;
+	t_render_vars		render_vars;
+	t_gun_vars			gun_vars;
+	t_map_processing	mprocess;
+	int					teleport_cooldown;
 }	t_game;
-// Walk_offset : Variable to simulate the walk effect
-// Frame counter to animate walk effect
-// portals[0] is blue, portals[1] is orange
 
 // UTILS
 int		free_all2(t_game *game);
