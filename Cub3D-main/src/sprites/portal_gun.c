@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   portal_gun.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 12:37:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 10:43:38 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 14:10:05 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,76 +35,13 @@ void	load_portal_gun(t_game *game)
 	}
 }
 
-// void	merge_texture(t_texture *bg, t_texture *fg, t_game *game, int x, int y)
-// {
-// 	int	i;
-// 	int	j;
-// 	int	fg_pixel;
-// 	int	bg_pixel;
-// 	int	transparency_color;
-
-// 	(void)bg_pixel;
-// 	(void)game;
-// 	j = 0;
-// 	transparency_color = 0x000000;
-// 	while (j < fg->height)
-// 	{
-// 		i = 0;
-// 		while (i < fg->width)
-// 		{
-// 			fg_pixel = fg->addr[j * fg->size_line / 4 + i];
-// 			if (fg_pixel != transparency_color)
-// 			{
-// 				bg_pixel = bg->addr[(y + j) * bg->size_line / 4 + (x + i)];
-// 				bg->addr[(y + j) * bg->size_line / 4 + (x + i)] = fg_pixel;
-// 			}
-// 			i++;
-// 		}
-// 		j++;
-// 	}
-// }
-
-// Créer une image de fond (background) pour l'overlay
-// Copier le fond dans l'image de fond
-// Fusionner les images
-// Afficher l'image combinée
-// Nettoyer les ressources
-// void	overlay_texture(t_texture *fg, t_texture *bg, t_game *game,
-// 	int x, int y)
-// {
-// 	t_texture	back;
-
-// 	back.img = mlx_new_image(game->mlx, game->win_width, game->win_height);
-// 	back.addr = (int *)mlx_get_data_addr(back.img, &back.pixel_bits,
-// 			&back.size_line, &back.endian);
-// 	back.width = game->win_width;
-// 	back.height = game->win_height;
-// 	back.pixel_bits = 32;
-// 	back.size_line = back.width * (back.pixel_bits / 8);
-// 	back.endian = 0;
-// 	memcpy(back.addr, bg->addr, back.size_line * back.height);
-// 	merge_texture(&back, fg, game, x, y);
-// 	mlx_put_image_to_window(game->mlx, game->win, back.img, 0, 0);
-// 	mlx_destroy_image(game->mlx, back.img);
-// }
-
-// Recul arme
-// Durée anim'
-void	display_portal_gun(t_game *game)
+void	calculate_gun_position(t_game *game, int *x, int *y)
 {
-	int	x;
-	int	y;
-
-	if (!game->portal_gun.img)
-	{
-		printf("Portal gun image is not loaded.\n");
-		return ;
-	}
-	x = (game->win_width - game->portal_gun.width) / 2;
-	y = game->win_height - game->portal_gun.height - 10;
+	*x = (game->win_width - game->portal_gun.width) / 2;
+	*y = game->win_height - game->portal_gun.height - 10;
 	if (game->gun_shot == 1)
 	{
-		y += 10;
+		*y += 10;
 		game->shot_frame++;
 		if (game->shot_frame > 5)
 		{
@@ -112,5 +49,41 @@ void	display_portal_gun(t_game *game)
 			game->shot_frame = 0;
 		}
 	}
-	mlx_put_image_to_window(game->mlx, game->win, game->portal_gun.img, x, y);
+}
+
+void	draw_portal_gun(t_game *game, t_texture *frame, int x, int y)
+{
+	int	i;
+	int	j;
+	int	color;
+
+	i = 0;
+	if (!game->portal_gun.img)
+	{
+		printf("Portal gun image is not loaded.\n");
+		return ;
+	}
+	while (i < game->portal_gun.height)
+	{
+		j = 0;
+		while (j < game->portal_gun.width)
+		{
+			color = game->portal_gun.addr[i * game->portal_gun.width + j];
+			if ((color & 0x00FFFFFF) != 0)
+			{
+				my_mlx_pixel_put(frame, x + j, y + i, color);
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
+void	display_portal_gun(t_game *game, t_texture *frame)
+{
+	int	x;
+	int	y;
+
+	calculate_gun_position(game, &x, &y);
+	draw_portal_gun(game, frame, x, y);
 }

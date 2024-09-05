@@ -382,7 +382,7 @@ void	draw_pixel(t_texture *img, int x, int y, int color);
 // SPRITES - DISPLAY
 int		display_each_frame(t_game *game);
 void	load_portal_gun(t_game *game);
-void	display_portal_gun(t_game *game);
+void	display_portal_gun(t_game *game, t_texture *frame);
 void	create_ball(t_game *game, int button);
 t_ball	*set_up_ball(t_game *game, int button);
 void	update_balls(t_game *game);

@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 16:54:27 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 13:28:30 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 14:05:04 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ void	check_portal_teleport(t_game *game)
 	}
 }
 
+// Update the display_each_frame function
 int	display_each_frame(t_game *game)
 {
 	t_texture	frame;
@@ -205,6 +206,7 @@ int	display_each_frame(t_game *game)
 	render_scene(game, &frame);
 	update_balls(game);
 	draw_ball(game, &frame);
+	display_portal_gun(game, &frame);
 	mlx_put_image_to_window(game->mlx, game->win, frame.img, 0, 0);
 	draw_mini_map(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->mini_map.img, 10, 10);
@@ -212,6 +214,5 @@ int	display_each_frame(t_game *game)
 	mlx_destroy_image(game->mlx, frame.img);
 	is_action(game);
 	check_portal_teleport(game);
-	display_portal_gun(game);
 	return (0);
 }
