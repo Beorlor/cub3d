@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:25:48 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 10:40:28 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 11:01:59 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,7 @@ int	are_rgb_ids_valid(const char *file)
 
 	init_type(&is_floor, &is_ceiling, &fd);
 	fd = open_file(file, fd);
-	if (fd == -1)
-		return (1);
-	while (1)
+	while (1 && fd != -1)
 	{
 		line = get_next_line(fd);
 		if (line == NULL)
@@ -81,7 +79,7 @@ int	are_rgb_ids_valid(const char *file)
 		}
 		free(line);
 	}
-	if (is_nb_of_rgb_good(is_ceiling, is_floor) == 1)
+	if (fd == -1 || is_nb_of_rgb_good(is_ceiling, is_floor) == 1)
 		return (1);
 	return (0);
 }
