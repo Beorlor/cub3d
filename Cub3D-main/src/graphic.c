@@ -12,210 +12,391 @@
 
 #include "../cub3D.h"
 
-// Check if the player is next to the door (only treat door as wall when adjacent)
-int is_player_next_to_door(t_game *game, int map_x, int map_y) {
-    // Check if the current block is a door
-    if (game->map.map[map_y][map_x] == 'D') {
-        // Check if the player is in the block to the left of the door
-        if (game->player.x > (map_x - 1) && game->player.x < map_x &&
-            game->player.y > map_y && game->player.y < (map_y + 1)) {
-            return 1; // Player is next to the door on the left
-        }
-        // Check if the player is in the block to the right of the door
-        if (game->player.x > (map_x + 1) && game->player.x < (map_x + 2) &&
-            game->player.y > map_y && game->player.y < (map_y + 1)) {
-            return 1; // Player is next to the door on the right
-        }
-        // Check if the player is in the block above the door
-        if (game->player.x > map_x && game->player.x < (map_x + 1) &&
-            game->player.y > (map_y - 1) && game->player.y < map_y) {
-            return 1; // Player is next to the door above
-        }
-        // Check if the player is in the block below the door
-        if (game->player.x > map_x && game->player.x < (map_x + 1) &&
-            game->player.y > (map_y + 1) && game->player.y < (map_y + 2)) {
-            return 1; // Player is next to the door below
-        }
-    }
-    return 0; // Player is not next to the door
+int	is_player_next_to_door_horizontal(t_game *game, int map_x, int map_y)
+{
+	if (game->player.x > (map_x - 1) && game->player.x < map_x
+		&& game->player.y > map_y && game->player.y < (map_y + 1))
+	{
+		return (1);
+	}
+	if (game->player.x > (map_x + 1) && game->player.x < (map_x + 2)
+		&& game->player.y > map_y && game->player.y < (map_y + 1))
+	{
+		return (1);
+	}
+	return (0);
 }
 
-void render_scene(t_game *game, t_texture *frame) {
-    int ceiling_color = (game->ceiling.r << 16) | (game->ceiling.g << 8) | game->ceiling.b;
-    int floor_color = (game->floor.r << 16) | (game->floor.g << 8) | game->floor.b;
+int	is_player_next_to_door_vertical(t_game *game, int map_x, int map_y)
+{
+	if (game->player.x > map_x && game->player.x < (map_x + 1)
+		&& game->player.y > (map_y - 1) && game->player.y < map_y)
+	{
+		return (1);
+	}
+	if (game->player.x > map_x && game->player.x < (map_x + 1)
+		&& game->player.y > (map_y + 1) && game->player.y < (map_y + 2))
+	{
+		return (1);
+	}
+	return (0);
+}
 
-    // Apply the walking offset to the rendering
-    int walk_offset = game->walk_offset;
+int	is_player_next_to_door(t_game *game, int map_x, int map_y)
+{
+	if (game->map.map[map_y][map_x] == 'D')
+	{
+		if (is_player_next_to_door_horizontal(game, map_x, map_y))
+			return (1);
+		if (is_player_next_to_door_vertical(game, map_x, map_y))
+			return (1);
+	}
+	return (0);
+}
 
-    // Draw the ceiling with walking offset
-    for (int y = 0; y < game->win_height / 2 + walk_offset; y++) {
-        for (int x = 0; x < game->win_width; x++) {
-            my_mlx_pixel_put(frame, x, y, ceiling_color);
-        }
-    }
+void	init_render_vars(t_game *game)
+{
+	game->render_vars.ceiling_color = (game->ceiling.r << 16)
+		| (game->ceiling.g << 8) | game->ceiling.b;
+	game->render_vars.floor_color = (game->floor.r << 16)
+		| (game->floor.g << 8) | game->floor.b;
+	game->render_vars.mid_height = game->win_height / 2;
+}
 
-    // Draw the floor with walking offset
-    for (int y = game->win_height / 2 + walk_offset; y < game->win_height; y++) {
-        for (int x = 0; x < game->win_width; x++) {
-            my_mlx_pixel_put(frame, x, y, floor_color);
-        }
-    }
+void	draw_ceiling(t_game *game, t_texture *frame)
+{
+	t_render_vars	*rv;
 
-    // Raycasting to draw the walls, doors, and portals
-    for (int x = 0; x < game->win_width; x++) {
-        // Calculate ray position and direction
-        double camera_x = (2 * x / (double)game->win_width - 1) / 2;
-        double ray_dir_x = game->player.dir_x + game->player.plane_x * camera_x;
-        double ray_dir_y = game->player.dir_y + game->player.plane_y * camera_x;
+	rv = &game->render_vars;
+	rv->y = 0;
+	while (rv->y < rv->mid_height + rv->walk_offset)
+	{
+		rv->x = 0;
+		while (rv->x < game->win_width)
+		{
+			my_mlx_pixel_put(frame, rv->x, rv->y, rv->ceiling_color);
+			rv->x++;
+		}
+		rv->y++;
+	}
+}
 
-        // Map position
-        int map_x = (int)game->player.x;
-        int map_y = (int)game->player.y;
+void	draw_floor(t_game *game, t_texture *frame)
+{
+	t_render_vars	*rv;
 
-        // Length of ray from one x or y-side to next x or y-side
-        double delta_dist_x = fabs(1 / ray_dir_x);
-        double delta_dist_y = fabs(1 / ray_dir_y);
+	rv = &game->render_vars;
+	rv->y = rv->mid_height + rv->walk_offset;
+	while (rv->y < game->win_height)
+	{
+		rv->x = 0;
+		while (rv->x < game->win_width)
+		{
+			my_mlx_pixel_put(frame, rv->x, rv->y, rv->floor_color);
+			rv->x++;
+		}
+		rv->y++;
+	}
+}
 
-        // Step and initial side_dist
-        int step_x, step_y;
-        double side_dist_x, side_dist_y;
+void	draw_ceiling_floor(t_game *game, t_texture *frame)
+{
+	draw_ceiling(game, frame);
+	draw_floor(game, frame);
+}
 
-        if (ray_dir_x < 0) {
-            step_x = -1;
-            side_dist_x = (game->player.x - map_x) * delta_dist_x;
-        } else {
-            step_x = 1;
-            side_dist_x = (map_x + 1.0 - game->player.x) * delta_dist_x;
-        }
+void	calc_ray_dir(t_game *game, int x)
+{
+	t_render_vars	*rv;
 
-        if (ray_dir_y < 0) {
-            step_y = -1;
-            side_dist_y = (game->player.y - map_y) * delta_dist_y;
-        } else {
-            step_y = 1;
-            side_dist_y = (map_y + 1.0 - game->player.y) * delta_dist_y;
-        }
+	rv = &game->render_vars;
+	rv->camera_x = (2 * x / (double)game->win_width - 1) / 2;
+	rv->ray_dir_x = game->player.dir_x + game->player.plane_x * rv->camera_x;
+	rv->ray_dir_y = game->player.dir_y + game->player.plane_y * rv->camera_x;
+	rv->map_x = (int)game->player.x;
+	rv->map_y = (int)game->player.y;
+}
 
-        // Perform DDA (Digital Differential Analysis)
-        int hit = 0;  // Was there a wall, door, or portal hit?
-        int side;     // Was a NS or a EW wall hit?
+void	calc_step_side_dist_x(t_game *game)
+{
+	t_render_vars	*rv;
 
-        while (hit == 0) {
-            // Jump to next map square, either in x-direction, or in y-direction
-            if (side_dist_x < side_dist_y) {
-                side_dist_x += delta_dist_x;
-                map_x += step_x;
-                side = 0;
-            } else {
-                side_dist_y += delta_dist_y;
-                map_y += step_y;
-                side = 1;
-            }
+	rv = &game->render_vars;
+	rv->delta_dist_x = fabs(1 / rv->ray_dir_x);
+	if (rv->ray_dir_x < 0)
+	{
+		rv->step_x = -1;
+		rv->side_dist_x = (game->player.x - rv->map_x) * rv->delta_dist_x;
+	}
+	else
+	{
+		rv->step_x = 1;
+		rv->side_dist_x = (rv->map_x + 1.0 - game->player.x) * rv->delta_dist_x;
+	}
+}
 
-            // Check if ray has hit a wall, door, or portal
-            if (game->map.map[map_y][map_x] == '1' ||
-                game->map.map[map_y][map_x] == '2' ||
-                game->map.map[map_y][map_x] == '3') {
-                hit = 1;  // Wall or portal hit
-            }
-            // Now check if it's a door, but treat it as a wall only when the player is next to it
-            else if (is_player_next_to_door(game, map_x, map_y)) {
-                hit = 1;  // Treat door as a wall if the player is next to it
-            }
-        }
+void	calc_step_side_dist_y(t_game *game)
+{
+	t_render_vars	*rv;
 
-        // Calculate distance projected on camera direction (perpendicular distance)
-        double perp_wall_dist;
-        if (side == 0)
-            perp_wall_dist = (map_x - game->player.x + (1 - step_x) / 2) / ray_dir_x;
-        else
-            perp_wall_dist = (map_y - game->player.y + (1 - step_y) / 2) / ray_dir_y;
+	rv = &game->render_vars;
+	rv->delta_dist_y = fabs(1 / rv->ray_dir_y);
+	if (rv->ray_dir_y < 0)
+	{
+		rv->step_y = -1;
+		rv->side_dist_y = (game->player.y - rv->map_y) * rv->delta_dist_y;
+	}
+	else
+	{
+		rv->step_y = 1;
+		rv->side_dist_y = (rv->map_y + 1.0 - game->player.y) * rv->delta_dist_y;
+	}
+}
 
-        // Calculate height of line to draw on screen
-        int line_height = (int)(game->win_height / perp_wall_dist);
+void	calc_step_side_dist(t_game *game)
+{
+	calc_step_side_dist_x(game);
+	calc_step_side_dist_y(game);
+}
 
-        // Calculate lowest and highest pixel to fill in current stripe, adjusted with walk offset
-        int draw_start = -line_height / 2 + game->win_height / 2 + walk_offset;
-        if (draw_start < 0) draw_start = 0;
-        int draw_end = line_height / 2 + game->win_height / 2 + walk_offset;
-        if (draw_end >= game->win_height) draw_end = game->win_height - 1;
+void	perform_dda_step(t_game *game)
+{
+	t_render_vars	*rv;
 
-        // Determine the texture based on what was hit (wall, door, or portal)
-        t_texture *texture;
-        t_texture *overlay_texture = NULL;
+	rv = &game->render_vars;
+	if (rv->side_dist_x < rv->side_dist_y)
+	{
+		rv->side_dist_x += rv->delta_dist_x;
+		rv->map_x += rv->step_x;
+		rv->side = 0;
+	}
+	else
+	{
+		rv->side_dist_y += rv->delta_dist_y;
+		rv->map_y += rv->step_y;
+		rv->side = 1;
+	}
+}
 
-        if (side == 0) {
-            texture = (step_x > 0) ? &game->textures[EAST] : &game->textures[WEST];
-        } else {
-            texture = (step_y > 0) ? &game->textures[SOUTH] : &game->textures[NORTH];
-        }
+void	perform_dda(t_game *game)
+{
+	t_render_vars	*rv;
 
-        // Adjust portal overlay based on which side was hit and portal's direction
-        if (game->map.map[map_y][map_x] == '2') {
-            if ((side == 0 && game->portals[0].direction == (step_x > 0 ? EAST : WEST)) ||
-                (side == 1 && game->portals[0].direction == (step_y > 0 ? SOUTH : NORTH))) {
-                overlay_texture = &game->portals[0].texture;  // Use blue portal texture
-            }
-        } else if (game->map.map[map_y][map_x] == '3') {
-            if ((side == 0 && game->portals[1].direction == (step_x > 0 ? EAST : WEST)) ||
-                (side == 1 && game->portals[1].direction == (step_y > 0 ? SOUTH : NORTH))) {
-                overlay_texture = &game->portals[1].texture;  // Use orange portal texture
-            }
-        }
+	rv = &game->render_vars;
+	rv->hit = 0;
+	while (rv->hit == 0)
+	{
+		perform_dda_step(game);
+		if (game->map.map[rv->map_y][rv->map_x] == '1'
+			|| game->map.map[rv->map_y][rv->map_x] == '2'
+			|| game->map.map[rv->map_y][rv->map_x] == '3'
+			|| is_player_next_to_door(game, rv->map_x, rv->map_y))
+		{
+			rv->hit = 1;
+		}
+	}
+}
 
-        // Calculate the exact position where the wall/portal was hit
-        double wall_x;
-        if (side == 0)
-            wall_x = game->player.y + perp_wall_dist * ray_dir_y;
-        else
-            wall_x = game->player.x + perp_wall_dist * ray_dir_x;
-        wall_x -= floor(wall_x);
+void	calc_wall_dist(t_game *game)
+{
+	t_render_vars	*rv;
 
-        // X coordinate on the texture
-        int tex_x = (int)(wall_x * (double)texture->width);
-        if (tex_x < 0) tex_x = 0;
-        if (tex_x >= texture->width) tex_x = texture->width - 1;
+	rv = &game->render_vars;
+	if (rv->side == 0)
+		rv->perp_wall_dist = (rv->map_x - game->player.x + (1 - rv->step_x) / 2)
+			/ rv->ray_dir_x;
+	else
+		rv->perp_wall_dist = (rv->map_y - game->player.y + (1 - rv->step_y) / 2)
+			/ rv->ray_dir_y;
+}
 
-        // Fix the texture direction issue
-        if (side == 0 && step_x < 0) tex_x = texture->width - tex_x - 1;
-        if (side == 1 && step_y > 0) tex_x = texture->width - tex_x - 1;
+void	calc_wall_height(t_game *game)
+{
+	t_render_vars	*rv;
 
-        // Draw the wall with the texture
-        for (int y = draw_start; y < draw_end; y++) {
-            // Calculate the y-coordinate on the texture, considering walk offset
-            int tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * texture->height) / line_height / 256;
+	rv = &game->render_vars;
+	rv->line_height = (int)(game->win_height / rv->perp_wall_dist);
+	rv->draw_start = -rv->line_height / 2 + game->win_height / 2
+		+ rv->walk_offset;
+	if (rv->draw_start < 0)
+		rv->draw_start = 0;
+	rv->draw_end = rv->line_height / 2 + game->win_height / 2 + rv->walk_offset;
+	if (rv->draw_end >= game->win_height)
+		rv->draw_end = game->win_height - 1;
+}
 
-            if (tex_y < 0) tex_y = 0;
-            if (tex_y >= texture->height) tex_y = texture->height - 1;
+void	calc_wall_dist_height(t_game *game)
+{
+	calc_wall_dist(game);
+	calc_wall_height(game);
+}
 
-            // Get the color from the texture
-            int color = texture->addr[tex_y * texture->width + tex_x];
+void	determine_wall_texture(t_game *game)
+{
+	t_render_vars	*rv;
 
-            // Darken the color if it's a side wall (for a shading effect)
-            if (side == 1) color = (color >> 1) & 0x7F7F7F;
+	rv = &game->render_vars;
+	if (rv->side == 0)
+	{
+		if (rv->step_x > 0)
+			rv->texture = &game->textures[EAST];
+		else
+			rv->texture = &game->textures[WEST];
+	}
+	else
+	{
+		if (rv->step_y > 0)
+			rv->texture = &game->textures[SOUTH];
+		else
+			rv->texture = &game->textures[NORTH];
+	}
+}
 
-            // Draw the wall pixel
-            my_mlx_pixel_put(frame, x, y, color);
+void	determine_overlay_texture(t_game *game)
+{
+	t_render_vars	*rv;
+	int				portal_index;
 
-            // If a portal is supposed to be drawn, overlay it
-            if (overlay_texture) {
-                // Calculate the coordinates on the portal texture
-                int overlay_tex_x = (int)(wall_x * (double)overlay_texture->width);
-                if (overlay_tex_x < 0) overlay_tex_x = 0;
-                if (overlay_tex_x >= overlay_texture->width) overlay_tex_x = overlay_texture->width - 1;
+	rv = &game->render_vars;
+	rv->overlay_texture = NULL;
+	if (game->map.map[rv->map_y][rv->map_x] == '2'
+		|| game->map.map[rv->map_y][rv->map_x] == '3')
+	{
+		if (game->map.map[rv->map_y][rv->map_x] == '2')
+			portal_index = 0;
+		else
+			portal_index = 1;
+		if ((rv->side == 0 && game->portals[portal_index].direction == EAST
+				&& rv->step_x > 0)
+			|| (rv->side == 0 && game->portals[portal_index].direction == WEST
+				&& rv->step_x <= 0)
+			|| (rv->side == 1 && game->portals[portal_index].direction == SOUTH
+				&& rv->step_y > 0)
+			|| (rv->side == 1 && game->portals[portal_index].direction == NORTH
+				&& rv->step_y <= 0))
+		{
+			rv->overlay_texture = &game->portals[portal_index].texture;
+		}
+	}
+}
 
-                int overlay_tex_y = (((y - walk_offset) * 256 - game->win_height * 128 + line_height * 128) * overlay_texture->height) / line_height / 256;
+void	calc_wall_x(t_game *game)
+{
+	t_render_vars	*rv;
 
-                if (overlay_tex_y < 0) overlay_tex_y = 0;
-                if (overlay_tex_y >= overlay_texture->height) overlay_tex_y = overlay_texture->height - 1;
+	rv = &game->render_vars;
+	if (rv->side == 0)
+		rv->wall_x = game->player.y + rv->perp_wall_dist * rv->ray_dir_y;
+	else
+		rv->wall_x = game->player.x + rv->perp_wall_dist * rv->ray_dir_x;
+	rv->wall_x -= floor(rv->wall_x);
+}
 
-                int overlay_color = overlay_texture->addr[overlay_tex_y * overlay_texture->width + overlay_tex_x];
+void	calc_tex_x(t_game *game)
+{
+	t_render_vars	*rv;
 
-                // Only draw the portal texture if the pixel is not black
-                if ((overlay_color & 0xFFFFFF) != 0x000000) {
-                    my_mlx_pixel_put(frame, x, y, overlay_color);
-                }
-            }
-        }
-    }
+	rv = &game->render_vars;
+	rv->tex_x = (int)(rv->wall_x * (double)rv->texture->width);
+	if (rv->tex_x < 0)
+		rv->tex_x = 0;
+	if (rv->tex_x >= rv->texture->width)
+		rv->tex_x = rv->texture->width - 1;
+	if (rv->side == 0 && rv->step_x < 0)
+		rv->tex_x = rv->texture->width - rv->tex_x - 1;
+	if (rv->side == 1 && rv->step_y > 0)
+		rv->tex_x = rv->texture->width - rv->tex_x - 1;
+}
+
+void	determine_texture(t_game *game)
+{
+	determine_wall_texture(game);
+	determine_overlay_texture(game);
+	calc_wall_x(game);
+	calc_tex_x(game);
+}
+
+void	calc_tex_y(t_game *game)
+{
+	t_render_vars	*rv;
+
+	rv = &game->render_vars;
+	rv->tex_y = (((rv->y - rv->walk_offset) * 256 - game->win_height * 128
+				+ rv->line_height * 128) * rv->texture->height)
+		/ rv->line_height / 256;
+	if (rv->tex_y < 0)
+		rv->tex_y = 0;
+	if (rv->tex_y >= rv->texture->height)
+		rv->tex_y = rv->texture->height - 1;
+}
+
+void	draw_wall_pixel(t_game *game, t_texture *frame, int x)
+{
+	t_render_vars	*rv;
+
+	rv = &game->render_vars;
+	rv->color = rv->texture->addr[rv->tex_y * rv->texture->width + rv->tex_x];
+	if (rv->side == 1)
+		rv->color = (rv->color >> 1) & 0x7F7F7F;
+	my_mlx_pixel_put(frame, x, rv->y, rv->color);
+}
+
+void	draw_overlay_pixel(t_game *game, t_texture *frame, int x)
+{
+	t_render_vars	*rv;
+
+	rv = &game->render_vars;
+	rv->overlay_tex_x = (int)(rv->wall_x * (double)rv->overlay_texture->width);
+	rv->overlay_tex_y = (((rv->y - rv->walk_offset) * 256 - game->win_height
+				* 128 + rv->line_height * 128) * rv->overlay_texture->height)
+		/ rv->line_height / 256;
+	if (rv->overlay_tex_x >= 0 && rv->overlay_tex_x < rv->overlay_texture->width
+		&& rv->overlay_tex_y >= 0
+		&& rv->overlay_tex_y < rv->overlay_texture->height)
+	{
+		rv->overlay_color = rv->overlay_texture->addr[rv->overlay_tex_y
+			* rv->overlay_texture->width + rv->overlay_tex_x];
+		if ((rv->overlay_color & 0xFFFFFF) != 0x000000)
+		{
+			my_mlx_pixel_put(frame, x, rv->y, rv->overlay_color);
+		}
+	}
+}
+
+void	draw_wall(t_game *game, t_texture *frame, int x)
+{
+	t_render_vars	*rv;
+
+	rv = &game->render_vars;
+	rv->y = rv->draw_start;
+	while (rv->y < rv->draw_end)
+	{
+		calc_tex_y(game);
+		draw_wall_pixel(game, frame, x);
+		if (rv->overlay_texture)
+		{
+			draw_overlay_pixel(game, frame, x);
+		}
+		rv->y++;
+	}
+}
+
+void	render_scene(t_game *game, t_texture *frame)
+{
+	t_render_vars	*rv;
+
+	rv = &game->render_vars;
+	init_render_vars(game);
+	draw_ceiling_floor(game, frame);
+	rv->x = 0;
+	while (rv->x < game->win_width)
+	{
+		calc_ray_dir(game, rv->x);
+		calc_step_side_dist(game);
+		perform_dda(game);
+		calc_wall_dist_height(game);
+		determine_texture(game);
+		draw_wall(game, frame, rv->x);
+		rv->x++;
+	}
 }

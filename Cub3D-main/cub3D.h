@@ -156,6 +156,41 @@ typedef struct s_player
 	double	rot_speed;
 }	t_player;
 
+typedef struct s_render_vars {
+    int ceiling_color;
+    int floor_color;
+    double camera_x;
+    double ray_dir_x;
+    double ray_dir_y;
+    int map_x;
+    int map_y;
+    double delta_dist_x;
+    double delta_dist_y;
+    int step_x;
+    int step_y;
+    double side_dist_x;
+    double side_dist_y;
+    int hit;
+    int side;
+    double perp_wall_dist;
+    int line_height;
+    int draw_start;
+    int draw_end;
+    double wall_x;
+    int tex_x;
+    int tex_y;
+    t_texture *texture;
+    t_texture *overlay_texture;
+    int x;
+    int y;
+    int walk_offset;
+    int mid_height;
+    int color;
+    int overlay_tex_x;
+    int overlay_tex_y;
+    int overlay_color;
+} t_render_vars;
+
 typedef struct s_game
 {
 	void		*mlx;
@@ -181,6 +216,7 @@ typedef struct s_game
 	int			frame_count;
 	t_portal	portals[2];
 	int			skip_mouse_event;
+	t_render_vars render_vars;
 }	t_game;
 // Walk_offset : Variable to simulate the walk effect
 // Frame counter to animate walk effect
