@@ -229,6 +229,12 @@ typedef struct s_gun_vars {
     int current_direction;
 } t_gun_vars;
 
+typedef struct s_map_processing {
+    int map_ended;
+    int description;
+    int map_started;
+} t_map_processing;
+
 typedef struct s_game
 {
 	void		*mlx;
@@ -256,6 +262,7 @@ typedef struct s_game
 	int			skip_mouse_event;
 	t_render_vars render_vars;
 	t_gun_vars gun_vars;
+	t_map_processing mprocess;
 }	t_game;
 // Walk_offset : Variable to simulate the walk effect
 // Frame counter to animate walk effect
