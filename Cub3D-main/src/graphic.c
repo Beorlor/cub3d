@@ -159,7 +159,7 @@ void	calc_step_side_dist(t_game *game)
 	calc_step_side_dist_y(game);
 }
 
-void	perform_dda_step(t_game *game)
+void	perform_dda_step2(t_game *game)
 {
 	t_render_vars	*rv;
 
@@ -186,7 +186,7 @@ void	perform_dda(t_game *game)
 	rv->hit = 0;
 	while (rv->hit == 0)
 	{
-		perform_dda_step(game);
+		perform_dda_step2(game);
 		if (game->map.map[rv->map_y][rv->map_x] == '1'
 			|| game->map.map[rv->map_y][rv->map_x] == '2'
 			|| game->map.map[rv->map_y][rv->map_x] == '3'

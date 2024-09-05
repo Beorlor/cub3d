@@ -191,6 +191,44 @@ typedef struct s_render_vars {
     int overlay_color;
 } t_render_vars;
 
+typedef struct s_gun_vars {
+	double x;
+	double y;
+    double center_x;
+    double center_y;
+    double dx;
+    double dy;
+    double distance;
+    double next_x;
+    double next_y;
+    int map_x;
+    int map_y;
+    int direction;
+    int side;
+    double delta_dist_x;
+    double delta_dist_y;
+    int step_x;
+    int step_y;
+    double side_dist_x;
+    double side_dist_y;
+    int portal_index;
+    int tex_width;
+    int tex_height;
+    double scale_x;
+    double scale_y;
+    int start_x;
+    int start_y;
+    int tex_x;
+    int tex_y;
+    int color;
+    int screen_x;
+    int screen_y;
+	int current_portal_index;
+    int current_map_x;
+    int current_map_y;
+    int current_direction;
+} t_gun_vars;
+
 typedef struct s_game
 {
 	void		*mlx;
@@ -217,6 +255,7 @@ typedef struct s_game
 	t_portal	portals[2];
 	int			skip_mouse_event;
 	t_render_vars render_vars;
+	t_gun_vars gun_vars;
 }	t_game;
 // Walk_offset : Variable to simulate the walk effect
 // Frame counter to animate walk effect

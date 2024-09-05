@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 09:15:22 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 10:30:51 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,256 +14,286 @@
 
 t_ball	*set_up_ball(t_game *game, int button)
 {
-	t_ball	*ball;
-
 	if (game->ball[0].active || game->ball[1].active)
-		return (NULL);  // Prevent shooting if a ball is already active
-
+		return (NULL);
 	if (button == 1)
 	{
-		ball = &game->ball[0];
 		game->ball[1].active = 0;
+		return (&game->ball[0]);
 	}
 	else if (button == 3)
 	{
-		ball = &game->ball[1];
 		game->ball[0].active = 0;
+		return (&game->ball[1]);
 	}
-	else
-	{
-		return (NULL);
-	}
-	return (ball);
+	return (NULL);
 }
 
-// Initialize the ball and set its initial positions
+void	init_ball2(t_game *game, t_ball *ball)
+{
+	ball->x = game->player.x;
+	ball->y = game->player.y;
+	ball->wx = (game->win_width / 2) - (ball->texture.width / 2);
+	ball->wy = game->win_height - 180;
+	ball->size = ball->texture.width;
+	ball->stage = 1;
+	ball->speed = 0.3;
+	ball->direction_x = game->player.dir_x;
+	ball->direction_y = game->player.dir_y;
+	ball->active = 1;
+}
+
 void	create_ball(t_game *game, int button)
 {
 	t_ball	*ball;
 
-	// Prevent shooting if a ball is already active
 	if (game->ball[0].active || game->ball[1].active)
-		return;
-
+		return ;
 	ball = set_up_ball(game, button);
 	if (ball == NULL)
-		return;
+		return ;
 	if (!ball->active)
-	{
-		// Initialize ball's real position (map coordinates)
-		ball->x = game->player.x;
-		ball->y = game->player.y;
-
-		// Initialize ball's window position (screen coordinates)
-		ball->wx = (game->win_width / 2) - (ball->texture.width / 2);
-		ball->wy = game->win_height - 180;
-
-		ball->size = ball->texture.width;
-		ball->stage = 1; // Start at stage 1
-		ball->speed = 0.3; // Slow speed for map movement
-
-		// Set the direction based on the player's direction
-		ball->direction_x = game->player.dir_x;
-		ball->direction_y = game->player.dir_y;
-
-		ball->active = 1;
-	}
+		init_ball2(game, ball);
 }
 
-// Move the ball towards the center of the screen (first stage of the animation)
 void	move_ball_towards_center(t_game *game, t_ball *ball)
 {
-	double center_x = game->win_width / 2.0;
-	double center_y = game->win_height / 2.0;
-	double dx = center_x - (ball->wx + ball->size / 2.0);
-	double dy = center_y - (ball->wy + ball->size / 2.0);
-	double distance = sqrt(dx * dx + dy * dy);
+	t_gun_vars	*gv;
 
-	// Shrink the ball slightly as it moves towards the center
+	gv = &game->gun_vars;
+	gv->center_x = game->win_width / 2.0;
+	gv->center_y = game->win_height / 2.0;
+	gv->dx = gv->center_x - (ball->wx + ball->size / 2.0);
+	gv->dy = gv->center_y - (ball->wy + ball->size / 2.0);
+	gv->distance = sqrt(gv->dx * gv->dx + gv->dy * gv->dy);
 	ball->size = fmax(5, ball->size - 1);
-
-	if (distance > 100.0)
+	if (gv->distance > 100.0)
 	{
-		ball->wx += (dx / distance) * 20;  // Faster movement to the center
-		ball->wy += (dy / distance) * 20;
+		ball->wx += (gv->dx / gv->distance) * 20;
+		ball->wy += (gv->dy / gv->distance) * 20;
 	}
 	else
 	{
-		// Ensure the ball ends exactly in the center for Stage 2 transition
-		ball->wx = center_x - (ball->size / 2.0);
-		ball->wy = center_y - (ball->size / 2.0);
-		ball->stage = 2; // Move to stage 2
+		ball->wx = gv->center_x - (ball->size / 2.0);
+		ball->wy = gv->center_y - (ball->size / 2.0);
+		ball->stage = 2;
 	}
 }
 
-// Deactivate the specified portal (blue or orange)
-void	deactivate_portal(t_game *game, int portal_index) {
-	if (game->portals[portal_index].active) {
-		game->map.map[(int)game->portals[portal_index].y][(int)game->portals[portal_index].x] = '1'; // Reset to wall
-		game->portals[portal_index].active = 0; // Deactivate the portal
-		game->portals[portal_index].link = 0; // Unlink the portal
+void	deactivate_portal(t_game *game, int portal_index)
+{
+	if (game->portals[portal_index].active)
+	{
+		game->map.map[(int)game->portals[portal_index].y][(int)game
+			->portals[portal_index].x] = '1';
+		game->portals[portal_index].active = 0;
+		game->portals[portal_index].link = 0;
 	}
 }
 
-// Unlink both portals
-void	unlink_portals(t_game *game) {
+void	unlink_portals(t_game *game)
+{
 	game->portals[0].link = 0;
 	game->portals[1].link = 0;
 }
 
-// Print portal information for debugging
-void	print_portal_info(t_game *game) {
-	printf("Blue Portal - x: %.2f, y: %.2f, direction: %d, active: %d, link: %d\n",
-		   game->portals[0].x, game->portals[0].y, game->portals[0].direction, game->portals[0].active, game->portals[0].link);
-	printf("Orange Portal - x: %.2f, y: %.2f, direction: %d, active: %d, link: %d\n",
-		   game->portals[1].x, game->portals[1].y, game->portals[1].direction, game->portals[1].active, game->portals[1].link);
+void	handle_blue_portal(t_game *game, int map_x, int map_y, int direction)
+{
+	if (game->map.map[map_y][map_x] == '3')
+	{
+		deactivate_portal(game, 0);
+		deactivate_portal(game, 1);
+		unlink_portals(game);
+	}
+	else if (game->map.map[map_y][map_x] == '2')
+	{
+		game->portals[0].direction = direction;
+		return ;
+	}
+	else if (game->map.map[map_y][map_x] == '1')
+		deactivate_portal(game, 0);
+	game->portals[0].active = 1;
+	game->portals[0].x = map_x;
+	game->portals[0].y = map_y;
+	game->portals[0].direction = direction;
+	game->map.map[map_y][map_x] = '2';
 }
 
-// Function to place a portal
-void	place_portal(t_game *game, int portal_index, int map_x, int map_y, int direction) {
-	//int other_portal_index = (portal_index == 0) ? 1 : 0;
-
-	// Handle blue portal ('2') interaction
-	if (portal_index == 0) {
-		if (game->map.map[map_y][map_x] == '3') {  // Blue hits orange
-			deactivate_portal(game, 0);  // Remove old blue portal
-			deactivate_portal(game, 1);  // Remove old orange portal
-			unlink_portals(game);  // Unlink both portals
-		} else if (game->map.map[map_y][map_x] == '2') {  // Blue hits blue
-			game->portals[0].direction = direction;  // Update direction
-			return;
-		} else if (game->map.map[map_y][map_x] == '1') {  // Blue hits wall
-			deactivate_portal(game, 0);  // Remove old blue portal
-		}
-
-		// Place the new blue portal
-		game->portals[0].active = 1;
-		game->portals[0].x = map_x;
-		game->portals[0].y = map_y;
-		game->portals[0].direction = direction;
-		game->map.map[map_y][map_x] = '2';  // Mark as blue portal block
-
-	// Handle orange portal ('3') interaction
-	} else if (portal_index == 1) {
-		if (game->map.map[map_y][map_x] == '2') {  // Orange hits blue
-			deactivate_portal(game, 0);  // Remove old blue portal
-			deactivate_portal(game, 1);  // Remove old orange portal
-			unlink_portals(game);  // Unlink both portals
-		} else if (game->map.map[map_y][map_x] == '3') {  // Orange hits orange
-			game->portals[1].direction = direction;  // Update direction
-			return;
-		} else if (game->map.map[map_y][map_x] == '1') {  // Orange hits wall
-			deactivate_portal(game, 1);  // Remove old orange portal
-		}
-
-		// Place the new orange portal
-		game->portals[1].active = 1;
-		game->portals[1].x = map_x;
-		game->portals[1].y = map_y;
-		game->portals[1].direction = direction;
-		game->map.map[map_y][map_x] = '3';  // Mark as orange portal block
+void	handle_orange_portal(t_game *game, int map_x, int map_y, int direction)
+{
+	if (game->map.map[map_y][map_x] == '2')
+	{
+		deactivate_portal(game, 0);
+		deactivate_portal(game, 1);
+		unlink_portals(game);
 	}
+	else if (game->map.map[map_y][map_x] == '3')
+	{
+		game->portals[1].direction = direction;
+		return ;
+	}
+	else if (game->map.map[map_y][map_x] == '1')
+		deactivate_portal(game, 1);
+	game->portals[1].active = 1;
+	game->portals[1].x = map_x;
+	game->portals[1].y = map_y;
+	game->portals[1].direction = direction;
+	game->map.map[map_y][map_x] = '3';
+}
 
-	// Check if the two portals are now linked
-	if (game->portals[0].active && game->portals[1].active) {
+void	set_portal_params(t_game *game, int portal_index, int map_x, int map_y)
+{
+	game->gun_vars.current_portal_index = portal_index;
+	game->gun_vars.current_map_x = map_x;
+	game->gun_vars.current_map_y = map_y;
+}
+
+void	place_portal(t_game *game)
+{
+	if (game->gun_vars.current_portal_index == 0)
+		handle_blue_portal(game, game->gun_vars.current_map_x,
+			game->gun_vars.current_map_y, game->gun_vars.current_direction);
+	else if (game->gun_vars.current_portal_index == 1)
+		handle_orange_portal(game, game->gun_vars.current_map_x,
+			game->gun_vars.current_map_y, game->gun_vars.current_direction);
+	if (game->portals[0].active && game->portals[1].active)
+	{
 		game->portals[0].link = 1;
 		game->portals[1].link = 1;
-	} else {
-		unlink_portals(game); // Unlink if one portal is deactivated
 	}
-
-	// Debug: Print portal values after placing a portal
-	print_portal_info(game);
+	else
+		unlink_portals(game);
 }
 
-// Move the ball towards the wall and place a portal
-void move_ball_towards_wall(t_game *game, t_ball *ball)
+void	init_dda(t_game *game, t_ball *ball)
 {
-    double next_x = ball->x + ball->direction_x * ball->speed;
-    double next_y = ball->y + ball->direction_y * ball->speed;
-    int map_x = (int)next_x;
-    int map_y = (int)next_y;
+	t_gun_vars	*gv;
 
-    int direction;
-    int side; // Track which side the ball hit
-
-    // DDA setup: calculate distances between current and next grid intersections
-    double delta_dist_x = fabs(1 / ball->direction_x);
-    double delta_dist_y = fabs(1 / ball->direction_y);
-
-    int step_x, step_y;
-    double side_dist_x, side_dist_y;
-
-    // Calculate step direction and initial side_dist
-    if (ball->direction_x < 0) {
-        step_x = -1;
-        side_dist_x = (ball->x - map_x) * delta_dist_x;
-    } else {
-        step_x = 1;
-        side_dist_x = (map_x + 1.0 - ball->x) * delta_dist_x;
-    }
-
-    if (ball->direction_y < 0) {
-        step_y = -1;
-        side_dist_y = (ball->y - map_y) * delta_dist_y;
-    } else {
-        step_y = 1;
-        side_dist_y = (map_y + 1.0 - ball->y) * delta_dist_y;
-    }
-
-    // Perform DDA to find the side of the wall the ball hit
-    while (1) {
-        if (side_dist_x < side_dist_y) {
-            side_dist_x += delta_dist_x;
-            map_x += step_x;
-            side = 0; // Horizontal side (East-West)
-        } else {
-            side_dist_y += delta_dist_y;
-            map_y += step_y;
-            side = 1; // Vertical side (North-South)
-        }
-
-        // Check if the ball hits a wall, door, blue portal, or orange portal
-        if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
-            game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
-
-            // If it's not a door, proceed with portal creation
-            if (game->map.map[map_y][map_x] != 'D') {
-                // Determine the direction of the hit side
-                if (side == 0) {
-                    direction = (step_x > 0) ? EAST : WEST; // Ball hit East or West side
-                } else {
-                    direction = (step_y > 0) ? SOUTH : NORTH; // Ball hit North or South side
-                }
-
-                // Place the portal on the correct wall side
-                int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
-                place_portal(game, portal_index, map_x, map_y, direction);
-            }
-            ball->active = 0; // Deactivate the ball after placing the portal or hitting the door
-            return;
-        }
-
-        // Check if the ball hits a door ('D')
-        if (game->map.map[map_y][map_x] == 'D') {
-            // Treat the door as a wall only if the player is near
-            if (is_player_next_to_door(game, map_x, map_y)) {
-                printf("Door hit by ball at map coordinates x = %d, y = %d\n", map_x, map_y);
-                ball->active = 0; // Deactivate the ball without creating a portal
-                return;
-            }
-        }
-    }
-
-    // Update ball position on the map
-    ball->x = next_x;
-    ball->y = next_y;
-
-    // Shrink the ball as it moves
-    ball->size = fmax(5, ball->size - 4);
+	gv = &game->gun_vars;
+	gv->delta_dist_x = fabs(1 / ball->direction_x);
+	gv->delta_dist_y = fabs(1 / ball->direction_y);
+	if (ball->direction_x < 0)
+	{
+		gv->step_x = -1;
+		gv->side_dist_x = (ball->x - gv->map_x) * gv->delta_dist_x;
+	}
+	else
+	{
+		gv->step_x = 1;
+		gv->side_dist_x = (gv->map_x + 1.0 - ball->x) * gv->delta_dist_x;
+	}
+	if (ball->direction_y < 0)
+	{
+		gv->step_y = -1;
+		gv->side_dist_y = (ball->y - gv->map_y) * gv->delta_dist_y;
+	}
+	else
+	{
+		gv->step_y = 1;
+		gv->side_dist_y = (gv->map_y + 1.0 - ball->y) * gv->delta_dist_y;
+	}
 }
 
-// Update the state of the balls
+int	perform_dda_step(t_game *game)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (gv->side_dist_x < gv->side_dist_y)
+	{
+		gv->side_dist_x += gv->delta_dist_x;
+		gv->map_x += gv->step_x;
+		gv->side = 0;
+	}
+	else
+	{
+		gv->side_dist_y += gv->delta_dist_y;
+		gv->map_y += gv->step_y;
+		gv->side = 1;
+	}
+	if (gv->map_x < 0 || gv->map_x >= game->map.width || gv->map_y < 0
+		|| gv->map_y >= game->map.height
+		|| game->map.map[gv->map_y][gv->map_x] == '1'
+		|| game->map.map[gv->map_y][gv->map_x] == '2'
+		|| game->map.map[gv->map_y][gv->map_x] == '3')
+		return (1);
+	if (game->map.map[gv->map_y][gv->map_x] == 'D'
+		&& is_player_next_to_door(game, gv->map_x, gv->map_y))
+		return (1);
+	return (0);
+}
+
+void	set_direction(t_game *game)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (gv->side == 0)
+	{
+		if (gv->step_x > 0)
+			gv->direction = EAST;
+		else
+			gv->direction = WEST;
+	}
+	else
+	{
+		if (gv->step_y > 0)
+			gv->direction = SOUTH;
+		else
+			gv->direction = NORTH;
+	}
+}
+
+void	set_portal_index(t_game *game, t_ball *ball)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (ball == &game->ball[0])
+		gv->portal_index = 0;
+	else
+		gv->portal_index = 1;
+}
+
+void	handle_ball_collision(t_game *game, t_ball *ball)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (game->map.map[gv->map_y][gv->map_x] != 'D')
+	{
+		set_direction(game);
+		set_portal_index(game, ball);
+		gv->current_direction = gv->direction;
+		set_portal_params(game, gv->portal_index, gv->map_x, gv->map_y);
+		place_portal(game);
+	}
+	ball->active = 0;
+}
+
+void	move_ball_towards_wall(t_game *game, t_ball *ball)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	gv->next_x = ball->x + ball->direction_x * ball->speed;
+	gv->next_y = ball->y + ball->direction_y * ball->speed;
+	gv->map_x = (int)gv->next_x;
+	gv->map_y = (int)gv->next_y;
+	init_dda(game, ball);
+	while (1)
+	{
+		if (perform_dda_step(game))
+		{
+			handle_ball_collision(game, ball);
+			return ;
+		}
+	}
+	ball->x = gv->next_x;
+	ball->y = gv->next_y;
+	ball->size = fmax(5, ball->size - 40);
+}
+
 void	update_balls(t_game *game)
 {
 	int	i;
@@ -282,88 +312,111 @@ void	update_balls(t_game *game)
 	}
 }
 
-// Load the textures for the balls
+void	load_ball_texture(t_game *game, int index, char *filename)
+{
+	game->ball[index].texture.img = mlx_xpm_file_to_image(game->mlx, filename,
+			&game->ball[index].texture.width,
+			&game->ball[index].texture.height);
+	if (!game->ball[index].texture.img)
+	{
+		printf("Failed to load ball texture: %s\n", filename);
+		free_all2(game);
+	}
+	game->ball[index].texture.addr = (int *)mlx_get_data_addr(game
+			->ball[index].texture.img,
+			&game->ball[index].texture.pixel_bits,
+			&game->ball[index].texture.size_line,
+			&game->ball[index].texture.endian);
+}
+
 void	load_ball_textures(t_game *game)
 {
-	game->ball[0].texture.img = mlx_xpm_file_to_image(game->mlx,
-			"src/sprites/sprites/orange_ball.xpm", &game->ball[0].texture.width,
-			&game->ball[0].texture.height);
-	if (!game->ball[0].texture.img)
+	load_ball_texture(game, 0, "src/sprites/sprites/orange_ball.xpm");
+	load_ball_texture(game, 1, "src/sprites/sprites/blue_ball2.xpm");
+}
+
+void	draw_ball_pixel(t_game *game, t_texture *frame, int i)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (gv->tex_x >= 0 && gv->tex_x < gv->tex_width && gv->tex_y >= 0
+		&& gv->tex_y < gv->tex_height)
 	{
-		printf("Failed to load orange ball texture\n");
-		free_all2(game);
+		gv->color = game->ball[i].texture.addr[gv->tex_y * gv->tex_width
+			+ gv->tex_x];
+		gv->screen_x = gv->start_x + gv->x;
+		gv->screen_y = gv->start_y + gv->y;
+		if (gv->screen_x >= 0 && gv->screen_x < game->win_width
+			&& gv->screen_y >= 0 && gv->screen_y < game->win_height
+			&& (gv->color & 0xFFFFFF) != 0x000000)
+		{
+			my_mlx_pixel_put(frame, gv->screen_x, gv->screen_y, gv->color);
+		}
 	}
-	game->ball[0].texture.addr = (int *)mlx_get_data_addr(
-			game->ball[0].texture.img, &game->ball[0].texture.pixel_bits,
-			&game->ball[0].texture.size_line, &game->ball[0].texture.endian);
-	game->ball[1].texture.img = mlx_xpm_file_to_image(game->mlx,
-			"src/sprites/sprites/blue_ball2.xpm", &game->ball[1].texture.width,
-			&game->ball[1].texture.height);
-	if (!game->ball[1].texture.img)
+}
+
+void	draw_ball_stage(t_game *game, int i)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	if (game->ball[i].stage == 1)
 	{
-		printf("Failed to load blue ball texture\n");
-		free_all2(game);
+		gv->start_x = (game->win_width / 2) - (game->ball[i].size / 2);
+		gv->start_y = game->ball[i].wy - (game->ball[i].size / 2);
 	}
-	game->ball[1].texture.addr = (int *)mlx_get_data_addr(
-			game->ball[1].texture.img, &game->ball[1].texture.pixel_bits,
-			&game->ball[1].texture.size_line, &game->ball[1].texture.endian);
+	else if (game->ball[i].stage == 2)
+	{
+		gv->start_x = (game->win_width / 2) - (game->ball[i].size / 2);
+		gv->start_y = (game->win_width / 2) - (game->ball[i].size / 2);
+	}
+}
+
+void	init_ball_draw(t_game *game, int i)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	gv->tex_width = game->ball[i].texture.width;
+	gv->tex_height = game->ball[i].texture.height;
+	gv->scale_x = (double)game->ball[i].size / gv->tex_width;
+	gv->scale_y = (double)game->ball[i].size / gv->tex_height;
+	draw_ball_stage(game, i);
+}
+
+void	draw_ball_row(t_game *game, t_texture *frame, int i)
+{
+	t_gun_vars	*gv;
+
+	gv = &game->gun_vars;
+	gv->x = 0;
+	while (gv->x < game->ball[i].size)
+	{
+		gv->tex_x = (int)(gv->x / gv->scale_x);
+		gv->tex_y = (int)(gv->y / gv->scale_y);
+		draw_ball_pixel(game, frame, i);
+		gv->x++;
+	}
 }
 
 void	draw_ball(t_game *game, t_texture *frame)
 {
-	int i;
+	t_gun_vars	*gv;
+	int			i;
 
+	gv = &game->gun_vars;
 	i = 0;
 	while (i < 2)
 	{
 		if (game->ball[i].active)
 		{
-			int tex_width = game->ball[i].texture.width;
-			int tex_height = game->ball[i].texture.height;
-
-			// Calculate the scale factor based on the current ball size
-			double scale_x = (double)game->ball[i].size / tex_width;
-			double scale_y = (double)game->ball[i].size / tex_height;
-
-			// Determine start_x and start_y based on the stage
-			int start_x, start_y;
-
-			if (game->ball[i].stage == 1) {
-				// Stage 1: Centered horizontally in the screen, moving vertically towards the center
-				start_x = (game->win_width / 2) - (game->ball[i].size / 2);
-				start_y = game->ball[i].wy - (game->ball[i].size / 2);
-			} else if (game->ball[i].stage == 2) {
-				// Stage 2: Centered based on wx and wy, representing its position in the world
-				start_x = (game->win_width / 2) - (game->ball[i].size / 2);
-				start_y = (game->win_width / 2) - (game->ball[i].size / 2);
-			}
-
-			// Loop through each pixel of the screen where the ball should be drawn
-			for (int y = 0; y < game->ball[i].size; y++)
+			init_ball_draw(game, i);
+			gv->y = 0;
+			while (gv->y < game->ball[i].size)
 			{
-				for (int x = 0; x < game->ball[i].size; x++)
-				{
-					// Calculate the corresponding position in the texture
-					int tex_x = (int)(x / scale_x);
-					int tex_y = (int)(y / scale_y);
-
-					// Ensure the texture coordinates are within bounds
-					if (tex_x >= 0 && tex_x < tex_width && tex_y >= 0 && tex_y < tex_height)
-					{
-						// Get the color from the texture
-						int color = game->ball[i].texture.addr[tex_y * tex_width + tex_x];
-
-						// Calculate the position to draw the pixel on the screen
-						int screen_x = start_x + x;
-						int screen_y = start_y + y;
-
-						// Skip rendering if the pixel is black or fully transparent
-						if (screen_x >= 0 && screen_x < game->win_width && screen_y >= 0 && screen_y < game->win_height && (color & 0xFFFFFF) != 0x000000)
-						{
-							my_mlx_pixel_put(frame, screen_x, screen_y, color);
-						}
-					}
-				}
+				draw_ball_row(game, frame, i);
+				gv->y++;
 			}
 		}
 		i++;
