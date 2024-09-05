@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 12:37:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 15:55:51 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:13:45 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ void	draw_portal_gun(t_game *game, t_texture *frame, int x, int y)
 		j = 0;
 		while (j < game->portal_gun.width)
 		{
-			//color = game->portal_gun.addr[i * game->portal_gun.width + j];
-			color = 0x00FFFF00;
+
+			color = (int)game->portal_gun.addr[(i + 1) * game->portal_gun.width + j];
 			if ((color & 0x00FFFFFF) != 0)
 			{
 				my_mlx_pixel_put(frame, x + j, y + i, color);
