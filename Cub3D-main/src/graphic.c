@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   graphic.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:18:07 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 15:18:10 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 03:36:04 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,14 @@ void render_scene(t_game *game, t_texture *frame) {
             }
 
             // Check if ray has hit a wall, door, or portal
-            if (game->map.map[map_y][map_x] == '1' ||
-                game->map.map[map_y][map_x] == 'D' ||
-                game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
-                hit = 1;  // Wall, door, or portal hit
+            if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+                hit = 1;  // Wall or portal hit
+            }
+            // Now check if it's a door, but treat it as a wall only when the player is near
+            else if (game->map.map[map_y][map_x] == 'D') {
+                if (fabs(game->player.x - map_x) < 1.0 || fabs(game->player.y - map_y) < 1.0) {
+                    hit = 1;  // Treat door as wall if player is near
+                }
             }
         }
 

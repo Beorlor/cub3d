@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 02:27:03 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 03:32:29 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,77 +177,90 @@ void	place_portal(t_game *game, int portal_index, int map_x, int map_y, int dire
 }
 
 // Move the ball towards the wall and place a portal
-void	move_ball_towards_wall(t_game *game, t_ball *ball) {
-	double next_x = ball->x + ball->direction_x * ball->speed;
-	double next_y = ball->y + ball->direction_y * ball->speed;
-	int map_x = (int)next_x;
-	int map_y = (int)next_y;
+void move_ball_towards_wall(t_game *game, t_ball *ball)
+{
+    double next_x = ball->x + ball->direction_x * ball->speed;
+    double next_y = ball->y + ball->direction_y * ball->speed;
+    int map_x = (int)next_x;
+    int map_y = (int)next_y;
 
-	int direction;
-	int side; // Track which side the ball hit
+    int direction;
+    int side; // Track which side the ball hit
 
-	// DDA setup: calculate distances between current and next grid intersections
-	double delta_dist_x = fabs(1 / ball->direction_x);
-	double delta_dist_y = fabs(1 / ball->direction_y);
+    // DDA setup: calculate distances between current and next grid intersections
+    double delta_dist_x = fabs(1 / ball->direction_x);
+    double delta_dist_y = fabs(1 / ball->direction_y);
 
-	int step_x, step_y;
-	double side_dist_x, side_dist_y;
+    int step_x, step_y;
+    double side_dist_x, side_dist_y;
 
-	// Calculate step direction and initial side_dist
-	if (ball->direction_x < 0) {
-		step_x = -1;
-		side_dist_x = (ball->x - map_x) * delta_dist_x;
-	} else {
-		step_x = 1;
-		side_dist_x = (map_x + 1.0 - ball->x) * delta_dist_x;
-	}
+    // Calculate step direction and initial side_dist
+    if (ball->direction_x < 0) {
+        step_x = -1;
+        side_dist_x = (ball->x - map_x) * delta_dist_x;
+    } else {
+        step_x = 1;
+        side_dist_x = (map_x + 1.0 - ball->x) * delta_dist_x;
+    }
 
-	if (ball->direction_y < 0) {
-		step_y = -1;
-		side_dist_y = (ball->y - map_y) * delta_dist_y;
-	} else {
-		step_y = 1;
-		side_dist_y = (map_y + 1.0 - ball->y) * delta_dist_y;
-	}
+    if (ball->direction_y < 0) {
+        step_y = -1;
+        side_dist_y = (ball->y - map_y) * delta_dist_y;
+    } else {
+        step_y = 1;
+        side_dist_y = (map_y + 1.0 - ball->y) * delta_dist_y;
+    }
 
-	// Perform DDA to find the side of the wall the ball hit
-	while (1) {
-		if (side_dist_x < side_dist_y) {
-			side_dist_x += delta_dist_x;
-			map_x += step_x;
-			side = 0; // Horizontal side (East-West)
-		} else {
-			side_dist_y += delta_dist_y;
-			map_y += step_y;
-			side = 1; // Vertical side (North-South)
-		}
+    // Perform DDA to find the side of the wall the ball hit
+    while (1) {
+        if (side_dist_x < side_dist_y) {
+            side_dist_x += delta_dist_x;
+            map_x += step_x;
+            side = 0; // Horizontal side (East-West)
+        } else {
+            side_dist_y += delta_dist_y;
+            map_y += step_y;
+            side = 1; // Vertical side (North-South)
+        }
 
-		// Check if the ball hits a wall (1), blue portal (2), or orange portal (3)
-		if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
-			game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+        // Check if the ball hits a wall, door, blue portal, or orange portal
+        if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height ||
+            game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
 
-			// Determine the direction of the hit side
-			if (side == 0) {
-				direction = (step_x > 0) ? EAST : WEST; // Ball hit East or West side
-			} else {
-				direction = (step_y > 0) ? SOUTH : NORTH; // Ball hit North or South side
-			}
+            // If it's not a door, proceed with portal creation
+            if (game->map.map[map_y][map_x] != 'D') {
+                // Determine the direction of the hit side
+                if (side == 0) {
+                    direction = (step_x > 0) ? EAST : WEST; // Ball hit East or West side
+                } else {
+                    direction = (step_y > 0) ? SOUTH : NORTH; // Ball hit North or South side
+                }
 
-			// Place the portal on the correct wall side
-			int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
-			place_portal(game, portal_index, map_x, map_y, direction);
-			ball->active = 0; // Deactivate the ball after placing the portal
+                // Place the portal on the correct wall side
+                int portal_index = (ball == &game->ball[0]) ? 0 : 1; // Determine portal index: 0 for blue, 1 for orange
+                place_portal(game, portal_index, map_x, map_y, direction);
+            }
+            ball->active = 0; // Deactivate the ball after placing the portal or hitting the door
+            return;
+        }
 
-			return;
-		}
-	}
+        // Check if the ball hits a door ('D')
+        if (game->map.map[map_y][map_x] == 'D') {
+            // Treat the door as a wall only if the player is near
+            if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0) {
+                printf("Door hit by ball at map coordinates x = %d, y = %d\n", map_x, map_y);
+                ball->active = 0; // Deactivate the ball without creating a portal
+                return;
+            }
+        }
+    }
 
-	// Update ball position on the map
-	ball->x = next_x;
-	ball->y = next_y;
+    // Update ball position on the map
+    ball->x = next_x;
+    ball->y = next_y;
 
-	// Shrink the ball as it moves
-	ball->size = fmax(5, ball->size - 4);
+    // Shrink the ball as it moves
+    ball->size = fmax(5, ball->size - 4);
 }
 
 // Update the state of the balls
