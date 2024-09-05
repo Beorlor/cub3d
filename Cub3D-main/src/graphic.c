@@ -2,15 +2,29 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   graphic.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
+/*                                                    +:+ +:+         +:+    */
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:18:07 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 03:36:04 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 03:21:53 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3D.h"
+
+// Check if the player is next to the door
+int is_player_next_to_door(t_game *game, int map_x, int map_y) {
+    // Check the adjacent cells around the door
+    if (game->map.map[map_y][map_x] == 'D') {
+        if ((map_x > 0 && game->map.map[map_y][map_x - 1] == '0' && fabs(game->player.x - (map_x - 1)) < 1.0) ||
+            (map_x < game->map.width - 1 && game->map.map[map_y][map_x + 1] == '0' && fabs(game->player.x - (map_x + 1)) < 1.0) ||
+            (map_y > 0 && game->map.map[map_y - 1][map_x] == '0' && fabs(game->player.y - (map_y - 1)) < 1.0) ||
+            (map_y < game->map.height - 1 && game->map.map[map_y + 1][map_x] == '0' && fabs(game->player.y - (map_y + 1)) < 1.0)) {
+            return 1; // Player is next to the door
+        }
+    }
+    return 0; // Player is not next to the door
+}
 
 void render_scene(t_game *game, t_texture *frame) {
     int ceiling_color = (game->ceiling.r << 16) | (game->ceiling.g << 8) | game->ceiling.b;
@@ -85,14 +99,14 @@ void render_scene(t_game *game, t_texture *frame) {
             }
 
             // Check if ray has hit a wall, door, or portal
-            if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3') {
+            if (game->map.map[map_y][map_x] == '1' ||
+                game->map.map[map_y][map_x] == '2' ||
+                game->map.map[map_y][map_x] == '3') {
                 hit = 1;  // Wall or portal hit
             }
-            // Now check if it's a door, but treat it as a wall only when the player is near
-            else if (game->map.map[map_y][map_x] == 'D') {
-                if (fabs(game->player.x - map_x) < 1.0 || fabs(game->player.y - map_y) < 1.0) {
-                    hit = 1;  // Treat door as wall if player is near
-                }
+            // Now check if it's a door, but treat it as a wall only when the player is next to it
+            else if (is_player_next_to_door(game, map_x, map_y)) {
+                hit = 1;  // Treat door as a wall if the player is next to it
             }
         }
 

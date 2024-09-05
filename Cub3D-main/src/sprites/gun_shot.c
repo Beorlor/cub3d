@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 15:22:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 03:32:29 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 04:22:05 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,7 @@ void move_ball_towards_wall(t_game *game, t_ball *ball)
         // Check if the ball hits a door ('D')
         if (game->map.map[map_y][map_x] == 'D') {
             // Treat the door as a wall only if the player is near
-            if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0) {
+            if (is_player_next_to_door(game, map_x, map_y)) {
                 printf("Door hit by ball at map coordinates x = %d, y = %d\n", map_x, map_y);
                 ball->active = 0; // Deactivate the ball without creating a portal
                 return;

@@ -323,5 +323,6 @@ void	my_mlx_pixel_put(t_texture *img, int x, int y, int color);
 
 // RENDERING FUNCTIONS
 void	render_scene(t_game *game, t_texture *frame);
+int		is_player_next_to_door(t_game *game, int map_x, int map_y);
 
 #endif

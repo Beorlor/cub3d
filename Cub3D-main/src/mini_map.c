@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 10:51:45 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 03:10:03 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 03:42:43 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,27 +45,25 @@ void	draw_mini_map_player(t_game *game)
 	}
 }
 
-int is_wall(t_game *game, double x, double y)
+// `is_wall` function to treat doors as walls only when the player is near
+int	is_wall(t_game *game, double x, double y)
 {
-    int map_x = (int)x;
-    int map_y = (int)y;
+	int	map_x;
+	int	map_y;
 
-    // Check if out of bounds
-    if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height)
-        return 1; // Out of bounds is a wall
-
-    // Check if it's a wall, blue portal (2), or orange portal (3)
-    if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3')
-        return 1; // Wall or portal is a wall
-
-    // Check if it's a door
-    if (game->map.map[map_y][map_x] == 'D') {
-        // Check if the player is near the door (within 1 block in any direction)
-        if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0)
-            return 1; // Treat door as a wall if the player is near
-    }
-
-    return 0; // No wall
+	map_x = (int)x;
+	map_y = (int)y;
+	if (map_x < 0 || map_x >= game->map.width || map_y < 0 || map_y >= game->map.height)
+		return 1; // Out of bounds treated as a wall
+	// Check if it's a wall
+	if (game->map.map[map_y][map_x] == '1' || game->map.map[map_y][map_x] == '2' || game->map.map[map_y][map_x] == '3')
+		return (1); // Wall or Portal acts as a wall
+	// Check if it's a door and player is near
+	if (game->map.map[map_y][map_x] == 'D') {
+		if (fabs(game->player.x - map_x) < 1.0 && fabs(game->player.y - map_y) < 1.0)
+			return (1); // Treat door as wall if player is near
+	}
+	return (0); // No wall
 }
 
 void	draw(t_texture *img, int x, int y, int color)
