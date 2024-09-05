@@ -16,11 +16,25 @@
 int is_player_next_to_door(t_game *game, int map_x, int map_y) {
     // Check the adjacent cells around the door
     if (game->map.map[map_y][map_x] == 'D') {
-        if ((map_x > 0 && game->map.map[map_y][map_x - 1] == '0' && fabs(game->player.x - (map_x - 1)) < 1.0) ||
-            (map_x < game->map.width - 1 && game->map.map[map_y][map_x + 1] == '0' && fabs(game->player.x - (map_x + 1)) < 1.0) ||
-            (map_y > 0 && game->map.map[map_y - 1][map_x] == '0' && fabs(game->player.y - (map_y - 1)) < 1.0) ||
-            (map_y < game->map.height - 1 && game->map.map[map_y + 1][map_x] == '0' && fabs(game->player.y - (map_y + 1)) < 1.0)) {
-            return 1; // Player is next to the door
+        // Check the left side
+        if (map_x > 0 && game->map.map[map_y][map_x - 1] == '0' &&
+            game->player.x >= map_x - 1 && game->player.x < map_x) {
+            return 1; // Player is left of the door
+        }
+        // Check the right side (unchanged)
+        if (map_x < game->map.width - 1 && game->map.map[map_y][map_x + 1] == '0' &&
+            fabs(game->player.x - (map_x + 1)) < 1.0) {
+            return 1; // Player is right of the door
+        }
+        // Check the top side
+        if (map_y > 0 && game->map.map[map_y - 1][map_x] == '0' &&
+            game->player.y >= map_y - 1 && game->player.y < map_y) {
+            return 1; // Player is above the door
+        }
+        // Check the bottom side (unchanged)
+        if (map_y < game->map.height - 1 && game->map.map[map_y + 1][map_x] == '0' &&
+            fabs(game->player.y - (map_y + 1)) < 1.0) {
+            return 1; // Player is below the door
         }
     }
     return 0; // Player is not next to the door
