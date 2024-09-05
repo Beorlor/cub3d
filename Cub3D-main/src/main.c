@@ -84,6 +84,9 @@ int	main(int argc, char *argv[])
 	free(map);
 	create_textures(&game);
 	load_portal_textures(&game);
+	memset(&game.render_vars, 0, sizeof(t_render_vars));
+	memset(&game.gun_vars, 0, sizeof(t_gun_vars));
+	memset(&game.mprocess, 0, sizeof(t_map_processing));
 	create_window(&game);
 	mlx_loop(game.mlx);
 	free_all2(&game);

@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 12:37:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 14:10:05 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 14:51:18 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,8 @@ void	display_portal_gun(t_game *game, t_texture *frame)
 	int	x;
 	int	y;
 
+	x = 0;
+	y = 0;
 	calculate_gun_position(game, &x, &y);
 	draw_portal_gun(game, frame, x, y);
 }
