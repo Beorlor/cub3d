@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   is_moving.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 16:09:52 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 17:11:27 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 07:00:44 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	move_north_or_south(t_game *game, double *move_x, double *move_y,
 {
 	double	movement_speed;
 
-	movement_speed = game->player.speed * 0.05;
+	movement_speed = game->player.speed * 0.2;
 	if (game->touch_state[W_INDEX])
 	{
 		(*move_x) += game->player.dir_x * movement_speed;

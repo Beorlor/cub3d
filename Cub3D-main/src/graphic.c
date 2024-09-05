@@ -12,29 +12,29 @@
 
 #include "../cub3D.h"
 
-// Check if the player is next to the door
+// Check if the player is next to the door (only treat door as wall when adjacent)
 int is_player_next_to_door(t_game *game, int map_x, int map_y) {
-    // Check the adjacent cells around the door
+    // Check if the current block is a door
     if (game->map.map[map_y][map_x] == 'D') {
-        // Check the left side
-        if (map_x > 0 && game->map.map[map_y][map_x - 1] == '0' &&
-            game->player.x >= map_x - 1 && game->player.x < map_x) {
-            return 1; // Player is left of the door
+        // Check if the player is in the block to the left of the door
+        if (game->player.x > (map_x - 1) && game->player.x < map_x &&
+            game->player.y > map_y && game->player.y < (map_y + 1)) {
+            return 1; // Player is next to the door on the left
         }
-        // Check the right side (unchanged)
-        if (map_x < game->map.width - 1 && game->map.map[map_y][map_x + 1] == '0' &&
-            fabs(game->player.x - (map_x + 1)) < 1.0) {
-            return 1; // Player is right of the door
+        // Check if the player is in the block to the right of the door
+        if (game->player.x > (map_x + 1) && game->player.x < (map_x + 2) &&
+            game->player.y > map_y && game->player.y < (map_y + 1)) {
+            return 1; // Player is next to the door on the right
         }
-        // Check the top side
-        if (map_y > 0 && game->map.map[map_y - 1][map_x] == '0' &&
-            game->player.y >= map_y - 1 && game->player.y < map_y) {
-            return 1; // Player is above the door
+        // Check if the player is in the block above the door
+        if (game->player.x > map_x && game->player.x < (map_x + 1) &&
+            game->player.y > (map_y - 1) && game->player.y < map_y) {
+            return 1; // Player is next to the door above
         }
-        // Check the bottom side (unchanged)
-        if (map_y < game->map.height - 1 && game->map.map[map_y + 1][map_x] == '0' &&
-            fabs(game->player.y - (map_y + 1)) < 1.0) {
-            return 1; // Player is below the door
+        // Check if the player is in the block below the door
+        if (game->player.x > map_x && game->player.x < (map_x + 1) &&
+            game->player.y > (map_y + 1) && game->player.y < (map_y + 2)) {
+            return 1; // Player is next to the door below
         }
     }
     return 0; // Player is not next to the door
