@@ -263,6 +263,7 @@ typedef struct s_game
 	t_render_vars render_vars;
 	t_gun_vars gun_vars;
 	t_map_processing mprocess;
+	int teleport_cooldown;
 }	t_game;
 // Walk_offset : Variable to simulate the walk effect
 // Frame counter to animate walk effect

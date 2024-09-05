@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   draw_mini_map.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 13:57:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 16:30:59 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 13:15:24 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,27 @@ void	my_mlx_pixel_put(t_texture *img, int x, int y, int color)
 
 	if (x >= 0 && x < img->width && y >= 0 && y < img->height)
 	{
-		dst = (char *)img->addr + (y * img->size_line + x
-				* (img->pixel_bits / 8));
+		dst = (char *)img->addr + (y * img->size_line + x * (img->pixel_bits
+					/ 8));
 		*(unsigned int *)dst = color;
 	}
+}
+
+void	draw_mini_map_pixel_color(t_game *game, char map_char, int x, int y)
+{
+	int	color;
+
+	if (map_char == '1')
+		color = 0xFFFFFF;
+	else if (map_char == 'D')
+		color = 0x00FF00;
+	else if (map_char == '2')
+		color = 0x0000FF;
+	else if (map_char == '3')
+		color = 0xFFA500;
+	else
+		color = 0x888888;
+	draw_pixel(&game->mini_map, x, y, color);
 }
 
 void	draw_mini_map_pixel(t_game *game, int y)
@@ -79,22 +96,19 @@ void	draw_mini_map_pixel(t_game *game, int y)
 	x = 0;
 	while (x < game->mini_map.width)
 	{
-		map_x = (int)((game->player.x - game->mini_map.width / 2 / T_SIZE)
-				+ x / T_SIZE);
-		map_y = (int)((game->player.y - game->mini_map.height / 2 / T_SIZE)
-				+ y / T_SIZE);
+		map_x = (int)((game->player.x - game->mini_map.width / 2 / T_SIZE) + x
+				/ T_SIZE);
+		map_y = (int)((game->player.y - game->mini_map.height / 2 / T_SIZE) + y
+				/ T_SIZE);
 		if (map_x >= 0 && map_x < game->map.width && map_y >= 0
 			&& map_y < game->map.height)
 		{
-			if (game->map.map[map_y][map_x] == '1')
-				draw_pixel(&game->mini_map, x, y, 0xFFFFFF);
-			else if (game->map.map[map_y][map_x] == 'D')
-				draw_pixel(&game->mini_map, x, y, 0x00FF00);
-			else
-				draw_pixel(&game->mini_map, x, y, 0x888888);
+			draw_mini_map_pixel_color(game, game->map.map[map_y][map_x], x, y);
 		}
 		else
+		{
 			draw_pixel(&game->mini_map, x, y, 0x555555);
+		}
 		x++;
 	}
 }
