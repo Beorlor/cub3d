@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 14:48:02 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 10:28:23 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 14:49:30 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	invalid_texture(t_game *game, char *line)
 {
 	printf("Invalid texture(s) - doublon\n");
 	free(line);
+	free(game->file);
 	free_all2(game);
 }
 

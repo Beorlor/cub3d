@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mini_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 10:51:45 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 13:31:46 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:45:33 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,5 +88,17 @@ void	draw(t_texture *img, int x, int y, int color)
 			j++;
 		}
 		i++;
+	}
+}
+
+void	my_mlx_pixel_put(t_texture *img, int x, int y, int color)
+{
+	char	*dst;
+
+	if (x >= 0 && x < img->width && y >= 0 && y < img->height)
+	{
+		dst = (char *)img->addr + (y * img->size_line + x * (img->pixel_bits
+					/ 8));
+		*(unsigned int *)dst = color;
 	}
 }

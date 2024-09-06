@@ -66,22 +66,22 @@ void	create_window(t_game *game)
 int	main(int argc, char *argv[])
 {
 	t_game	game;
-	char	*map;
 
 	if (argc != 2)
 		return (printf("Wrong nb of arguments\n"), 1);
-	map = ft_strdup(argv[1]);
-	if (!map)
+	memset(&game, 0, sizeof(t_game));
+	game.file = ft_strdup(argv[1]);
+	if (!game.file)
 		return (printf("There is no map\n"), 1);
 	game.mlx = mlx_init();
 	if (!game.mlx)
 		return (printf("Could not start mlx\n"), 1);
 	init_cub(&game);
-	read_map(&game, map);
+	read_map(&game);
 	malloc_map(&game);
-	fill_map(&game, map);
-	manage_errors(&game, map);
-	free(map);
+	fill_map(&game);
+	manage_errors(&game);
+	free(game.file);
 	create_textures(&game);
 	load_portal_textures(&game);
 	memset(&game.render_vars, 0, sizeof(t_render_vars));
@@ -89,6 +89,5 @@ int	main(int argc, char *argv[])
 	memset(&game.mprocess, 0, sizeof(t_map_processing));
 	create_window(&game);
 	mlx_loop(game.mlx);
-	free_all2(&game);
-	return (0);
+	return (free_all2(&game), 0);
 }

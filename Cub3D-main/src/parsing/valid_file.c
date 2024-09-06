@@ -6,22 +6,23 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:47:26 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 18:08:55 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:41:50 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../cub3D.h"
 
-int	is_file_extension_valid(const char *file)
+int	is_file_extension_valid(t_game *game)
 {
 	int	start_position;
 	int	extension;
 	int	size;
 
-	size = ft_strlen(file);
+	size = ft_strlen(game->file);
 	extension = ft_strlen(".cub");
 	start_position = size - extension;
-	if (start_position < 0 || ft_strcmp(file + start_position, ".cub") != 0)
+	if (start_position < 0 || ft_strcmp(game->file
+			+ start_position, ".cub") != 0)
 	{
 		printf("Not a .cub file\n");
 		return (1);
@@ -29,20 +30,22 @@ int	is_file_extension_valid(const char *file)
 	return (0);
 }
 
-int	is_file_empty(const char *file, t_game *game)
+int	is_file_empty(t_game *game)
 {
 	int		fd;
 	char	c;
 
-	fd = open(file, O_RDONLY);
+	fd = open(game->file, O_RDONLY);
 	if (fd == -1)
 	{
 		printf("Could not open the map file\n");
+		free(game->file);
 		free_all2(game);
 	}
 	if (read(fd, &c, 1) == 0)
 	{
 		printf("File is empty\n");
+		free(game->file);
 		close(fd);
 		free_all2(game);
 	}

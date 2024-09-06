@@ -50,6 +50,17 @@
 # define MINIMAP_WIDTH 100
 # define MINIMAP_HEIGHT 100
 
+// #define KEY_ESC     65307  // Échap (Escape)
+// #define KEY_UP      65362  // Flèche haut
+// #define KEY_DOWN    65364  // Flèche bas
+// #define KEY_W       119    // W
+// #define KEY_A       97     // A
+// #define KEY_S       115    // S
+// #define KEY_D       100    // D
+// #define KEY_LEFT    65361  // Flèche gauche
+// #define KEY_RIGHT   65363  // Flèche droite
+// #define SZ          32     // Espace (Space)
+
 # define MOUSE_LEFT_CLICK 1
 
 typedef enum s_texture_index
@@ -250,11 +261,15 @@ typedef struct s_game
 	int					frame_count;
 	t_portal			portals[2];
 	int					skip_mouse_event;
+	char				*file;
 	t_render_vars		render_vars;
 	t_gun_vars			gun_vars;
 	t_map_processing	mprocess;
 	int					teleport_cooldown;
 }	t_game;
+// Walk_offset : Variable to simulate the walk effect
+// Frame counter to animate walk effect
+// portals[0] is blue, portals[1] is orange
 
 // UTILS
 int		free_all2(t_game *game);
@@ -280,11 +295,11 @@ void	init_color(t_color *color);
 void	init_input(t_input *input);
 void	create_window(t_game *game);
 void	create_textures(t_game *game);
-void	read_map(t_game *game, char *file);
+void	read_map(t_game *game);
 void	malloc_map(t_game *game);
-void	fill_map(t_game *game, char *file);
+void	fill_map(t_game *game);
 void	init_textures(t_game *game);
-void	manage_errors(t_game *game, char *file);
+void	manage_errors(t_game *game);
 void	init_ball(t_game	*game);
 void	init_player(t_player *player);
 void	init_map(t_map *map);
@@ -297,6 +312,7 @@ int		is_char_valid(t_game *game);
 int		are_walls_valid(t_game *game);
 char	**get_map(t_game *game);
 int		flood_fill(t_game *game, char **map, int x, int y);
+void	add_spaces_to_map(t_game *game);
 int		is_end_of_map(char *line, int fd);
 int		is_player_valid(t_game *game);
 void	manage_width(t_game *game, char *line);
@@ -311,7 +327,7 @@ void	set_up_west(t_game *game);
 void	set_up_south(t_game *game);
 
 // FILE ERRORS
-int		is_file_valid(const char *file, t_game *game);
+int		is_file_valid(t_game *game);
 int		parse_rgb(char *line, int *r, int *g, int *b);
 int		is_rgb_code(t_game *game, char *line);
 void	invalid_rgb(char *line, t_game *game);
@@ -324,12 +340,12 @@ void	invalid_texture(t_game *game, char *line);
 int		are_file_textures_valid(t_game *game);
 int		is_file_full(const char *file, t_game *game);
 int		are_paths_textures_valid(t_game *game);
-int		are_rgb_ids_valid(const char *file);
+int		are_rgb_ids_valid(t_game *game);
 int		process_map(char *line, int fd, int map_ended);
 int		handle_description(char *line, int description);
-int		is_file_extension_valid(const char *file);
-int		is_file_empty(const char *file, t_game *game);
-int		is_there_something_after_map(const char *file, t_game *game);
+int		is_file_extension_valid(t_game *game);
+int		is_file_empty(t_game *game);
+int		is_there_something_after_map(t_game *game);
 void	init_type(int *floor, int *ceiling, int *fd);
 int		ceiling(int is_ceiling, char c);
 int		if_floor(int is_floor, char c);
@@ -341,6 +357,9 @@ void	init_ceiling_colors(t_game *game, int r, int g, int b);
 void	init_floor_colors(t_game *game, int r, int g, int b);
 int		are_textures_xpm(t_game *game);
 void	load_portal_textures(t_game *game);
+int		is_end_of_file(int map_started, int description);
+int		open_file2(const char *file);
+int		end_of_file_loop(int fd, t_map_processing *mprocess);
 
 // EVENTS MANAGEMENT
 int		mouse_move(int x, int y, t_input *input);
@@ -390,9 +409,33 @@ void	move_ball_towards_center(t_game *game, t_ball *ball);
 void	load_ball_textures(t_game *game);
 void	draw_ball(t_game *game, t_texture *frame);
 void	my_mlx_pixel_put(t_texture *img, int x, int y, int color);
+void	check_portal_teleport(t_game *game);
+void	set_teleport_direction(t_portal *portal, double *dx, double *dy);
+void	decrease_teleport_cooldown(t_game *game);
+int		is_teleport_on_cooldown(t_game *game);
 
 // RENDERING FUNCTIONS
 void	render_scene(t_game *game, t_texture *frame);
 int		is_player_next_to_door(t_game *game, int map_x, int map_y);
+void	calc_ray_dir(t_game *game, int x);
+void	calc_step_side_dist(t_game *game);
+void	perform_dda(t_game *game);
+void	calc_wall_dist_height(t_game *game);
+void	determine_texture(t_game *game);
+void	draw_wall(t_game *game, t_texture *frame, int x);
+void	set_direction(t_game *game);
+void	set_portal_index(t_game *game, t_ball *ball);
+void	set_portal_params(t_game *game, int portal_index, int map_x, int map_y);
+void	place_portal(t_game *game);
+void	init_dda(t_game *game, t_ball *ball);
+int		perform_dda_step(t_game *game);
+void	deactivate_portal(t_game *game, int portal_index);
+void	determine_wall_texture(t_game *game);
+void	determine_overlay_texture(t_game *game);
+void	calc_wall_x(t_game *game);
+void	calc_step_side_dist_x(t_game *game);
+void	calc_wall_dist(t_game *game);
+void	draw_wall_pixel(t_game *game, t_texture *frame, int x);
+void	calc_tex_y(t_game *game);
 
 #endif

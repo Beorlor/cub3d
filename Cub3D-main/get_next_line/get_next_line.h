@@ -3,39 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/11 14:36:50 by jedurand          #+#    #+#             */
-/*   Updated: 2024/09/05 01:08:34 by jedurand         ###   ########.fr       */
+/*   Created: 2023/10/18 16:22:31 by jeguerin          #+#    #+#             */
+/*   Updated: 2024/09/05 14:17:39 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# include <limits.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <unistd.h>
-
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 10
+#  define BUFFER_SIZE 1
 # endif
 
-typedef struct s_ist
-{
-	char			*content;
-	struct s_ist	*next;
-}				t_ist;
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdio.h>
 
 char	*get_next_line(int fd);
-int		found_newline(t_ist *stash);
-t_ist	*ft_lst_get_last(t_ist *stash);
-void	read_and_stash(int fd, t_ist **stash);
-void	extract_line(t_ist *stash, char **line);
-void	generate_line(char **line, t_ist *stash);
-void	clean_stash(t_ist **stash);
-int		ft_strlen2(const char *str);
-void	free_stash(t_ist *stash);
+int		ft_strlen_gnl(char *str);
+int		ft_strchr_gnl(const char *str, int c);
+char	*ft_strndup_gnl(const char *str, int size);
+char	*ft_join(char *s1, char *s2);
+char	*update_stash(char *stash);
+char	*extract_line(char *stash);
+void	*ft_calloc(size_t nmemb, size_t size);
+void	free_all(void);
+void	*malloc(size_t size);
+void	free(void *ptr);
+void	*ft_realloc(void *ptr, size_t size);
+
 #endif

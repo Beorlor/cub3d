@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:51:29 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 14:39:01 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:40:42 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,10 @@ char	**get_map(t_game *game)
 	return (map);
 }
 
-int	are_walls_valid(t_game *game)
+void	free_map(char **map)
 {
-	char	**map;
-	int		i;
+	int	i;
 
-	map = get_map(game);
-	if (map == NULL)
-		return (printf("Can't copy map\n"), 1);
-	if (flood_fill(game, map, game->player.x, game->player.y) == 1)
-		return (printf("Map is not surrounded by walls\n"), 1);
 	i = 0;
 	while (map[i])
 	{
@@ -47,6 +41,18 @@ int	are_walls_valid(t_game *game)
 		i++;
 	}
 	free(map);
+}
+
+int	are_walls_valid(t_game *game)
+{
+	char	**map;
+
+	map = get_map(game);
+	if (map == NULL)
+		return (printf("Can't copy map\n"), free_map(map), 1);
+	if (flood_fill(game, map, game->player.x, game->player.y) == 1)
+		return (printf("Map is not surrounded by walls\n"), free_map(map), 1);
+	free_map(map);
 	return (0);
 }
 
@@ -62,7 +68,7 @@ int	flood_fill(t_game *game, char **map, int x, int y)
 			|| (y < game->map.height - 1 && map[y + 1][x] == ' ')
 			|| (x > 0 && map[y][x - 1] == ' ')
 			|| (x < game->map.width - 1 && map[y][x + 1] == ' '))
-			return (printf("X: %d\n", x), printf("Y: %d\n", y), 1);
+			return (1);
 	}
 	map[y][x] = 'X';
 	if (flood_fill(game, map, x - 1, y - 1) == 1
@@ -77,25 +83,31 @@ int	flood_fill(t_game *game, char **map, int x, int y)
 	return (0);
 }
 
-// int flood_fill(t_game *game, char **map, int x, int y)
-// {
-//     if (x < 0 || y < 0 || y >= game->map.height || x >= game->map.width)
-//         return 1; // Hors limites
-//     if (map[y][x] == '1' || map[y][x] == 'X')
-//         return 0; // Case visitée ou mur
-//     if (map[y][x] == '0')
-//     {
-//         if ((y > 0 && map[y - 1][x] == ' ') ||
-//             (y < game->map.height - 1 && map[y + 1][x] == ' ') ||
-//             (x > 0 && map[y][x - 1] == ' ') || // Case à gauche
-//             (x < game->map.width - 1 && map[y][x + 1] == ' '))
-//             return 1; // Contact avec un espace vide
-//     }
-//     map[y][x] = 'X';
-//     if (flood_fill(game, map, y - 1, x) == 1 ||
-//         flood_fill(game, map, y + 1, x) == 1 ||
-//         flood_fill(game, map, y, x - 1) == 1 ||
-//         flood_fill(game, map, y, x + 1) == 1)
-//         return 1;
-//     return 0;
-// }
+void	add_spaces_to_map(t_game *game)
+{
+	int		i;
+	int		j;
+	char	*str;
+
+	i = 0;
+	while (i < game->map.height)
+	{
+		str = malloc(sizeof(char) * (game->map.width + 1));
+		j = 0;
+		while (game->map.map[i][j])
+		{
+			str[j] = game->map.map[i][j];
+			j++;
+		}
+		while (j < game->map.width)
+		{
+			str[j] = ' ';
+			j++;
+		}
+		str[j] = '\0';
+		free(game->map.map[i]);
+		game->map.map[i] = str;
+		str = NULL;
+		i++;
+	}
+}

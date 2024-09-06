@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/29 14:52:26 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 10:26:20 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:59:49 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ int	check_door(t_game *game, int i, int j)
 int	door_error(t_game *game, int door, int value)
 {
 	if (door > 1)
-		return (printf("There are too many doors\n"), free_all2(game));
+		return (printf("There are too many doors\n"), free(game->file),
+			free_all2(game));
 	else if (value == 1)
 		return (0);
 	return (-1);
@@ -58,7 +59,7 @@ int	is_door_valid(t_game *game)
 	while (game->map.map[++i])
 	{
 		j = 0;
-		while (game->map.map[j])
+		while (game->map.map[i][j])
 		{
 			if (game->map.map[i][j] == 'D')
 			{

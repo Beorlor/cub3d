@@ -36,7 +36,7 @@ void	init_game(t_game *game)
 	game->frame_count = 0;
 	game->walk_offset = 0;
 	game->skip_mouse_event = 0;
-	game->teleport_cooldown = 0;
+	game->teleport_cooldown = 50;
 }
 
 void	init_mini_map(t_game *game)

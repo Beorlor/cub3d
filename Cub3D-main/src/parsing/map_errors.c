@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_errors.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 17:26:00 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/01 03:58:26 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:40:22 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ int	is_char_valid(t_game *game)
 	int	j;
 
 	i = 0;
+	add_spaces_to_map(game);
 	while (i < game->map.height)
 	{
 		j = 0;

@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 11:52:19 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 19:47:20 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 18:11:50 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ int	free_all2(t_game *game)
 {
 	int	i;
 
-	printf("OK free \n");
 	mlx_do_key_autorepeaton(game->mlx);
 	if (game->map.map)
 	{

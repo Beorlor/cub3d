@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   portal_gun.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 12:37:16 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 16:13:45 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:05:42 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ void	draw_portal_gun(t_game *game, t_texture *frame, int x, int y)
 		j = 0;
 		while (j < game->portal_gun.width)
 		{
-
-			color = (int)game->portal_gun.addr[(i + 1) * game->portal_gun.width + j];
+			color = (int)game->portal_gun.addr[(i + 1)
+				* game->portal_gun.width + j];
 			if ((color & 0x00FFFFFF) != 0)
 			{
 				my_mlx_pixel_put(frame, x + j, y + i, color);

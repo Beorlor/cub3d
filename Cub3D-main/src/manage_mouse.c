@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 10:51:31 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 20:27:06 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 16:47:11 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,11 @@ int	manage_mouse_movement(int x, int y, t_game *game)
 	dx = x - center_x;
 	angle = dx * 0.003;
 	rotate_player(game, angle);
-	// game->skip_mouse_event = 1;
-	// mlx_mouse_move(game->mlx, game->win, center_x, center_y);
-	// game->skip_mouse_event = 0;
 	return (0);
 }
-
+// game->skip_mouse_event = 1;
+	// mlx_mouse_move(game->mlx, game->win, center_x, center_y);
+	// game->skip_mouse_event = 0;
 
 int	manage_mouse_click(int button, int x, int y, t_game *game)
 {

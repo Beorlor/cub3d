@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   draw_mini_map.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 13:57:58 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 13:15:24 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 17:40:04 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,18 +55,6 @@ void	draw_view_direction(t_game *game, t_texture *mini_map)
 			break ;
 		draw(mini_map, (int)(map_x / T_SIZE), (int)(map_y / T_SIZE), 0xFF0000);
 		i++;
-	}
-}
-
-void	my_mlx_pixel_put(t_texture *img, int x, int y, int color)
-{
-	char	*dst;
-
-	if (x >= 0 && x < img->width && y >= 0 && y < img->height)
-	{
-		dst = (char *)img->addr + (y * img->size_line + x * (img->pixel_bits
-					/ 8));
-		*(unsigned int *)dst = color;
 	}
 }
 

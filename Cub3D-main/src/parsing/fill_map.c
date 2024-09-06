@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fill_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:33:07 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/05 11:50:16 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/09/05 14:53:42 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	loop_to_fill_map(t_game *game, int fd, int *textures, int *rgb)
 	}
 }
 
-void	fill_map(t_game *game, char *file)
+void	fill_map(t_game *game)
 {
 	int		fd;
 	int		textures;
@@ -46,29 +46,23 @@ void	fill_map(t_game *game, char *file)
 	textures = 0;
 	rgb = 0;
 	fd = 1;
-	fd = open_file(file, fd);
+	fd = open_file(game->file, fd);
 	if (fd == -1)
 	{
-		free(file);
+		free(game->file);
 		free_all2(game);
 	}
-	memset(game->texture_paths, 0, sizeof(game->texture_paths));
 	memset(game->map.map, 0, sizeof(char *) * (game->map.height));
 	loop_to_fill_map(game, fd, &textures, &rgb);
 	if (check_nb_of_rgb_textures(rgb, textures) == 1)
 	{
-		free(file);
+		free(game->file);
 		close(fd);
 		free_all2(game);
 	}
 	close(fd);
 }
 
-/* MAP ERRORS
-	5. Map shape errors
-		a. Check si la map est carrée (par contre check JB's tickets car
-		la map n'est pas toujours carrée mais il faut qd même le check).
-*/
 int	check_map_line(char *line)
 {
 	int	has_valid_char;
@@ -89,16 +83,17 @@ int	check_map_line(char *line)
 
 // printf("height : %d\n", game->map.height);
 // printf("width : %d\n", game->map.width);
-void	read_map(t_game *game, char *file)
+void	read_map(t_game *game)
 {
 	int		fd;
 	char	*line;
 
-	fd = open(file, O_RDONLY);
+	memset(game->texture_paths, 0, sizeof(game->texture_paths));
+	fd = open(game->file, O_RDONLY);
 	if (fd == -1)
 	{
 		printf("Could not open the map file\n");
-		free(file);
+		free(game->file);
 		free_all2(game);
 	}
 	while (1)

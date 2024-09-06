@@ -6,7 +6,7 @@
 /*   By: jeguerin <jeguerin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 15:39:43 by jeguerin          #+#    #+#             */
-/*   Updated: 2024/09/04 19:23:36 by jeguerin         ###   ########.fr       */
+/*   Updated: 2024/09/05 13:25:22 by jeguerin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void	invalid_rgb(char *line, t_game *game)
 {
 	printf("Invalid id for RGB color\n");
 	free(line);
+	free(game->file);
 	free_all2(game);
 }
 
